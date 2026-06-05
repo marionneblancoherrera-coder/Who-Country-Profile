@@ -1,0 +1,398 @@
+{
+  "meta": {
+    "country": "Costa Rica",
+    "iso2": "CR",
+    "iso3": "CRI",
+    "dak_domain": "ANC",
+    "generated": "2026-05-25",
+    "platform_version": "2.0.0",
+    "mode": "pre-mission"
+  },
+  "classification": {
+    "governance_model": "centralized",
+    "financing_model": "sovereign",
+    "implementation_model": "national_platform",
+    "digital_architecture": "proprietary",
+    "interoperability_state": "transitional",
+    "operational_maturity": "mature",
+    "international_organisation_host": false,
+    "derived_operational_profile": "PROFILE_SOVEREIGN_NATIONAL",
+    "category_code": "CE",
+    "category_label": "Centralized National Health System",
+    "fragmentation_score": 2.05,
+    "fragmentation_label": "Low fragmentation"
+  },
+  "dynamic_signals": {
+    "active_transition": true,
+    "interoperability_gap": true,
+    "donor_dependency": false,
+    "low_real_world_adoption": false,
+    "vendor_fragmentation": false,
+    "source_sovereignty_restriction": false
+  },
+  "block1": {
+    "population": {
+      "value": "5,129,910",
+      "year": 2024,
+      "confidence_code": "V",
+      "source_label": "PAHO / Health in the Americas",
+      "source_url": "https://hia.paho.org/en/node/140",
+      "tier": 1
+    },
+    "life_expectancy_years": {
+      "value": 81.0,
+      "year": 2024,
+      "confidence_code": "V",
+      "source_label": "PAHO / Health in the Americas",
+      "source_url": "https://hia.paho.org/en/node/140",
+      "tier": 1
+    },
+    "health_expenditure_pct_gdp": {
+      "value": "6.78%",
+      "year": 2024,
+      "confidence_code": "V",
+      "source_label": "OECD / World Health Systems Facts",
+      "source_url": "https://healthsystemsfacts.org/national-health-systems/the-mixed-beveridge-bismarck-model/costa-rica/costa-rica-health-system-expenditures/",
+      "tier": 1,
+      "note": "Government/compulsory 4.80% + voluntary/OOP 1.99%"
+    },
+    "out_of_pocket_pct_current_health_exp": {
+      "value": "24.1%",
+      "year": 2023,
+      "confidence_code": "I",
+      "source_label": "OECD / World Health Systems Facts",
+      "source_url": "https://healthsystemsfacts.org/national-health-systems/the-mixed-beveridge-bismarck-model/costa-rica/costa-rica-health-system-expenditures/",
+      "tier": 1,
+      "note": "PAHO 2021 figure = 20.74%; slight discrepancy, no CONTRADICTED flag as different years"
+    },
+    "physician_density_per_1000": {
+      "value": "~2.6",
+      "year": 2022,
+      "confidence_code": "I",
+      "source_label": "OECD estimate / WHO GHO",
+      "source_url": "https://healthsystemsfacts.org/national-health-systems/the-mixed-beveridge-bismarck-model/costa-rica/costa-rica-health-system-overview/",
+      "tier": 2,
+      "note": "Well above RISK_LOW_OPERATOR_CAPACITY threshold (0.2/1000). No flag triggered."
+    },
+    "uhc_service_coverage_index": {
+      "value": "≥80",
+      "year": 2021,
+      "confidence_code": "V",
+      "source_label": "WHO / World Health Systems Facts",
+      "source_url": "https://healthsystemsfacts.org/national-health-systems/the-mixed-beveridge-bismarck-model/costa-rica/costa-rica-health-system-overview/",
+      "tier": 1
+    },
+    "anc4_plus_coverage_pct": {
+      "value": "76.6%",
+      "year": 2016,
+      "confidence_code": "IW",
+      "source_label": "PAHO / Health in the Americas",
+      "source_url": "https://hia.paho.org/en/node/140",
+      "tier": 1,
+      "note": "Declined from 87% in 2010. Data from 2016 — >3 years old. No 2023/2024 update found. Post-WHO 2016 8-contact guideline compliance not measured."
+    },
+    "anc1_coverage_pct": {
+      "value": null,
+      "confidence_code": "U",
+      "source_label": null,
+      "note": "Not retrieved for Costa Rica in current sources. Likely >95% given 97.9% skilled birth attendance."
+    },
+    "skilled_birth_attendance_pct": {
+      "value": "97.9%",
+      "year": 2016,
+      "confidence_code": "IW",
+      "source_label": "PAHO / Health in the Americas",
+      "source_url": "https://hia.paho.org/en/node/140",
+      "tier": 1,
+      "note": "Data from 2016. Likely stable or improved given CCSS coverage expansion."
+    },
+    "maternal_mortality_ratio_per_100k": {
+      "value": "24",
+      "year": 2023,
+      "confidence_code": "V",
+      "source_label": "WHO / World Health Systems Facts",
+      "source_url": "https://healthsystemsfacts.org/national-health-systems/the-mixed-beveridge-bismarck-model/costa-rica/costa-rica-health-system-overview/",
+      "tier": 1,
+      "note": "2020 estimate was 22 (PAHO). 2023 estimate 24. Slight increase — consistent with post-COVID-19 disruption pattern in the region. Not CONTRADICTED (different years, same trend)."
+    },
+    "neonatal_mortality_rate_per_1000": {
+      "value": 7.2,
+      "year": 2023,
+      "confidence_code": "V",
+      "source_label": "WHO / World Health Systems Facts",
+      "source_url": "https://healthsystemsfacts.org/national-health-systems/the-mixed-beveridge-bismarck-model/costa-rica/costa-rica-health-system-overview/",
+      "tier": 1
+    },
+    "adolescent_birth_rate_per_1000_15_19": {
+      "value": 24.8,
+      "year": 2024,
+      "confidence_code": "V",
+      "source_label": "PAHO / Health in the Americas",
+      "source_url": "https://hia.paho.org/en/node/140",
+      "tier": 1,
+      "note": "Decrease of 70.2% since 2000 (from 83.4). ANC equity signal: rural adolescents begin prenatal care in 2nd trimester at significantly higher rates than urban (Acta Médica 2023)."
+    },
+    "contraceptive_prevalence_pct": {
+      "value": null,
+      "confidence_code": "U",
+      "source_label": null,
+      "note": "Not retrieved from available sources."
+    },
+    "national_guidelines_current": {
+      "value": false,
+      "year": 2022,
+      "confidence_code": "V",
+      "source_label": "CCSS / cendeisss.sa.cr",
+      "source_url": "https://www.cendeisss.sa.cr/wp-content/uploads/2023/02/Protocolo-de-Atencion-Clinica-integral-al-embarazo-parto-y-postparto-2.pdf",
+      "tier": 1,
+      "note": "Protocolo de Atencion Clinica integral al embarazo, parto y postparto (2022) — year 2022 < 2023 (current_year − 3). Adapted from original 2009 protocol. Guidelines_current = false."
+    },
+    "active_gf_grant": {
+      "value": false,
+      "confidence_code": "I",
+      "source_label": "Global Fund portfolio (no CR entry)",
+      "note": "Costa Rica is not a Global Fund recipient country. Upper-middle income, sovereign financing."
+    },
+    "pepfar_active": {
+      "value": false,
+      "confidence_code": "I",
+      "note": "PEPFAR not active in Costa Rica."
+    },
+    "gavi_eligible": {
+      "value": false,
+      "confidence_code": "I",
+      "note": "Costa Rica is high-income / upper-middle income; not GAVI eligible."
+    },
+    "quality_gap_evidence": {
+      "value": true,
+      "confidence_code": "VA",
+      "source_label": "country_taxonomy-2.yml / IDB 2023",
+      "note": "Taxonomy entry: only 4/94 health areas achieve >80% quality prenatal care (NDHS 2023-2030). High nominal coverage, low quality coverage — QUALITY_COVERAGE_GAP flag triggered."
+    },
+    "q1_pubmed_cross_check": {
+      "ran": true,
+      "result": "Acta Médica Costarricense (2023): rural adolescents begin ANC in 2nd trimester at substantially higher rates than urban. PMC8173660 (2021): duplicative reporting and lack of feedback identified as main barriers to PHC data use. Both confirm equity and quality gaps. No contradictions with official figures — official sources simply do not report quality-adjusted ANC.",
+      "conflict_found": false
+    }
+  },
+  "block1_priming_for_b2": {
+    "expected_systems": ["EDUS (proprietary CCSS)"],
+    "expected_system_confidence": {"EDUS": 0.99},
+    "dak_use_case": "quality_standardisation_not_coverage_expansion",
+    "risk_flags_to_anticipate": [
+      "RISK_VENDOR_IS_GOVERNMENT",
+      "RISK_INTEROPERABILITY_GAP",
+      "QUALITY_COVERAGE_GAP",
+      "GUIDELINES_OUTDATED",
+      "RISK_TRANSITION"
+    ],
+    "source_strategy_notes": [
+      "PROFILE_SOVEREIGN_NATIONAL: Use PAHO/IDB/Exemplars as primary sources. Run mandatory PMC failure/adoption query after each official source.",
+      "No global goods expected. DAK target system: EDUS — requires CCSS institutional agreement, not vendor contracting."
+    ]
+  },
+  "block2": {
+    "poc_system_name": {
+      "value": "EDUS (Expediente Digital Único en Salud)",
+      "confidence_code": "V",
+      "source_label": "IDB Technical Note 2023",
+      "source_url": "https://publications.iadb.org/en/costa-ricas-unified-digital-health-record-edus-system-best-practices-history-and-implementation",
+      "tier": 1
+    },
+    "poc_system_type": {
+      "value": "Proprietary cloud-based unified EHR — government-built",
+      "confidence_code": "V",
+      "source_label": "IDB 2023 / PMC11056608 (2024)",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11056608/",
+      "tier": 1,
+      "note": "No FOSS or global good. Built entirely in-house by CCSS from 2010. Rolled out 2015-2018."
+    },
+    "poc_nominal_coverage": {
+      "value": "97%+ population",
+      "confidence_code": "V",
+      "source_label": "PMC11056608 (Mora-García 2024, BMJ Global Health)",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11056608/",
+      "tier": 2,
+      "note": "CCSS covers >97% of population. EDUS deployed across all 3 care levels and all 105 health areas."
+    },
+    "poc_real_adoption": {
+      "value": "Widely used — no documented adoption gap",
+      "confidence_code": "VA",
+      "source_label": "PMC11056608 (2024) / IDB 2023",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11056608/",
+      "tier": 2,
+      "note": "EDUS described as 'widely used across all levels of attention' by 2020. COVID response leveraged EDUS as real-time control tower. No RISK_ADOPTION_GAP triggered. Caveat: 2022 ransomware attack paralyzed EDUS for 2 months."
+    },
+    "poc_maintainer": {
+      "value": "CCSS (Caja Costarricense de Seguro Social) — government institution",
+      "confidence_code": "V",
+      "source_label": "IDB 2023",
+      "source_url": "https://publications.iadb.org/en/costa-ricas-unified-digital-health-record-edus-system-best-practices-history-and-implementation",
+      "tier": 1,
+      "note": "CCSS is simultaneously client, developer, and operator. No external vendor. RISK_VENDOR_IS_GOVERNMENT triggered."
+    },
+    "hmis_platform": {
+      "value": "SIVEI (Sistema Nacional de Vigilancia Epidemiológica) — Ministry of Health",
+      "confidence_code": "V",
+      "source_label": "Exemplars.health / PAHO",
+      "source_url": "https://www.exemplars.health/emerging-topics/ecr/costa-rica",
+      "tier": 1,
+      "note": "SIVEI is operated by MoH, institutionally separate from CCSS/EDUS."
+    },
+    "poc_hmis_integration": {
+      "value": false,
+      "confidence_code": "V",
+      "source_label": "PAHO / country_taxonomy-2.yml",
+      "source_url": "https://hia.paho.org/en/node/140",
+      "tier": 1,
+      "note": "EDUS (CCSS) and SIVEI (MoH) are institutionally separate; no automatic ANC data exchange confirmed. PAHO and taxonomy both document this. RISK_INTEROPERABILITY_GAP triggered."
+    },
+    "fragmentation_score": {
+      "value": 2.05,
+      "confidence_code": "I",
+      "note": "parallel_ehr_ecosystems:0×0.30 + interoperability_absence:7×0.25 + regional_governance_autonomy:0×0.20 + vendor_diversity:0×0.15 + standards_inconsistency:3×0.10 = 0+1.75+0+0+0.30=2.05. LOW fragmentation. Single national system — fragmentation concern is EDUS–SIVEI gap only."
+    },
+    "system_in_transition": {
+      "value": true,
+      "confidence_code": "V",
+      "source_label": "PAHO / Ministerio de Salud CR (Dec 2023)",
+      "source_url": "https://www.paho.org/en/node/94063",
+      "tier": 1,
+      "note": "Estrategia Nacional Salud Digital 2023-2030 enacted. PAHO supporting HL7 FHIR implementation as of Dec 2023. CCSS integrating clinical terminology tool (likely SNOMED CT) into EDUS as of May 2025. National Policy 2023-2033 includes interoperability roadmap. RISK_TRANSITION triggered."
+    },
+    "active_global_goods": {
+      "value": "None",
+      "confidence_code": "V",
+      "source_label": "country_taxonomy-2.yml / WHO Digital Health Atlas (absent)",
+      "note": "EDUS absent from WHO Digital Health Atlas and Digital Square. No DHIS2, OpenMRS, Bahmni or OpenLMIS in CCSS health system. Standard global goods DAK integration path does not apply."
+    },
+    "dak_target_system": {
+      "value": "EDUS — requires formal CCSS institutional agreement and internal development commitment",
+      "confidence_code": "V",
+      "note": "Proprietary system maintained by government. No vendor can be contracted independently. Step 4 (software update) requires CCSS governance board decision plus internal IT development capacity."
+    },
+    "digital_maturity_level": {
+      "value": "Phase 3 overall (Phase 2 on interoperability and standards)",
+      "year": 2023,
+      "confidence_code": "V",
+      "source_label": "Estrategia Nacional Salud Digital CR 2023-2030 / WHO Digital Health Monitor",
+      "source_url": "https://www.ministeriodesalud.go.cr/index.php/biblioteca-de-archivos-left/documentos-ministerio-de-salud/ministerio-de-salud/salud-digital/hoja-de-ruta-salud-digital/6765-estrategia-nacional-de-salud-digital-de-costa-rica/file",
+      "tier": 3,
+      "note": "Assessed using WHO Global Digital Health Monitor methodology. Infrastructure (Phase 4) and Services/Apps (Phase 4) are mature. Interoperability and standards remain Phase 2 challenges."
+    },
+    "q1_cross_checks": {
+      "query_A": {
+        "query": "Costa Rica AND electronic health record AND (adoption OR barriers OR uptake)",
+        "result": "PMC8173660 (2021): Primary barriers to EHR data use = duplicative reporting + inconsistent feedback loops. No adoption gap in EDUS per se, but data quality and feedback mechanisms are weak. IDB 2023: EDUS 2022 cyberattack paralyzed service for 2 months — resilience risk documented.",
+        "contradiction_found": false
+      },
+      "query_B": {
+        "query": "Costa Rica AND health information system AND (fragmentation OR interoperability)",
+        "result": "Estrategia Nacional Salud Digital 2023: interoperability rated Phase 2/5. PAHO Dec 2023: HL7 FHIR implementation underway to address EDUS-SIVEI gap. Confirms RISK_INTEROPERABILITY_GAP.",
+        "contradiction_found": false
+      },
+      "query_C": {
+        "query": "Costa Rica AND digital health AND (migration OR transition) last 2yr",
+        "result": "Ministerio de Salud 2023-2033 Policy: interoperability of electronic clinical records named as strategic action. CCSS SNOMED CT integration (May 2025). Confirms RISK_TRANSITION.",
+        "contradiction_found": false
+      }
+    }
+  },
+  "block2_priming_confirmed": {
+    "EDUS_confirmed": true,
+    "global_goods_absent_confirmed": true,
+    "dak_use_case_confirmed": "quality_standardisation",
+    "interoperability_gap_confirmed": true,
+    "vendor_is_government_confirmed": true
+  },
+  "risk_flags": [
+    {
+      "name": "RISK_VENDOR_IS_GOVERNMENT",
+      "category": "base",
+      "status": "ACTIVE",
+      "severity": "medium",
+      "triggered_by": "poc_maintainer=CCSS AND digital_architecture=proprietary",
+      "source": "IDB 2023 / PMC11056608",
+      "dak_impact": "Step 4 (software update) requires formal CCSS governance board decision and internal IT development budget. No external vendor can be contracted independently.",
+      "mandatory_moh_question": "Does the CCSS IT team have capacity and budget in the 2026–2027 roadmap for DAK ANC content integration? Who approves changes to EDUS — the technical leadership or the governance board?"
+    },
+    {
+      "name": "RISK_INTEROPERABILITY_GAP",
+      "category": "base",
+      "status": "ACTIVE",
+      "severity": "medium",
+      "triggered_by": "poc_hmis_integration=false AND dak_domain=ANC",
+      "source": "PAHO / Estrategia Nacional Salud Digital 2023",
+      "dak_impact": "ANC indicators captured at point of care in EDUS will not flow automatically to SIVEI (national ANC surveillance). Interinstitutional CCSS-MoH agreement required in addition to technical integration.",
+      "mandatory_moh_question": "Is there an automated data flow from EDUS to SIVEI for ANC indicators? If not, is there an existing CCSS-MoH interinstitutional agreement or is one being negotiated under the 2023-2033 Digital Policy?"
+    },
+    {
+      "name": "RISK_TRANSITION",
+      "category": "base",
+      "status": "ACTIVE",
+      "severity": "high",
+      "triggered_by": "system_in_transition=true (HL7 FHIR + SNOMED CT + Estrategia 2023-2030)",
+      "source": "PAHO Dec 2023 / Ministerio de Salud CR / ticosland.com May 2025",
+      "dak_impact": "EDUS is undergoing active technical evolution (HL7 FHIR integration, SNOMED CT terminology). DAK integration must be coordinated with this transition to avoid rework. FHIR adoption may simplify future DAK integration if aligned early.",
+      "mandatory_moh_question": "What is the HL7 FHIR implementation timeline for EDUS? Should DAK ANC content integration wait for FHIR layer completion, or proceed in parallel using the current EDUS data model?"
+    },
+    {
+      "name": "QUALITY_COVERAGE_GAP",
+      "category": "emergent",
+      "status": "ACTIVE",
+      "severity": "medium",
+      "triggered_by": "skilled_birth_attendance=97.9% AND quality_gap_evidence=true (only 4/94 health areas with >80% quality ANC)",
+      "source": "country_taxonomy-2.yml / IDB 2023 / NDHS 2023-2030",
+      "dak_impact": "DAK use case is quality standardisation, not coverage expansion. Decision-support rules and protocol adherence monitoring are more relevant than basic data capture functionality. This is the primary ANC DAK value proposition for Costa Rica.",
+      "mandatory_moh_question": "What quality monitoring metrics does the MoH/CCSS use alongside ANC4+ coverage figures? Which health areas or facilities have the largest quality gap, and are these captured in EDUS data?"
+    },
+    {
+      "name": "GUIDELINES_OUTDATED",
+      "category": "emergent",
+      "status": "ACTIVE",
+      "severity": "medium",
+      "triggered_by": "national_guidelines_year=2022 < current_year(2026)-3=2023",
+      "source": "CCSS / cendeisss.sa.cr (2022 protocol)",
+      "dak_impact": "CCSS 2022 ANC protocol (adapted from 2009) is now 4 years old. EDUS may have embedded the 4-visit model rather than the WHO 2016 8-contact model. Step 2 of DAK localisation (content review) needs to address guidelines currency.",
+      "mandatory_moh_question": "Is a CCSS ANC guidelines update planned? Does EDUS clinical decision support embed the WHO 2016 8-contact model or the prior 4-visit model? Should DAK content alignment wait for updated national guidelines or proceed with current protocol noting the gap?"
+    }
+  ],
+  "reliability_scores": {
+    "b1_score": 0.86,
+    "b1_breakdown": {
+      "fields_filled_ratio": 0.929,
+      "tier1_2_ratio": 0.846,
+      "recent_ratio": 0.692,
+      "no_conflict_ratio": 0.923,
+      "q1_ran": true,
+      "penalty_fragile_state": 0,
+      "penalty_survey_age": 0
+    },
+    "b2_score": 0.91,
+    "b2_breakdown": {
+      "fields_filled_ratio": 1.0,
+      "tier1_2_ratio": 0.818,
+      "recent_ratio": 0.909,
+      "no_conflict_ratio": 0.909,
+      "q1_ran": true
+    },
+    "profile_score": 0.885,
+    "profile_label": "HIGH CONFIDENCE",
+    "known_gaps": [
+      "ANC4+ data (2016 only — no 2023/2024 national survey found for high-income PAHO countries)",
+      "Skilled birth attendance (2016 only)",
+      "Contraceptive prevalence not retrieved",
+      "ANC1 coverage not retrieved",
+      "EDUS quality of ANC-specific data capture (beyond appointment tracking) — requires CCSS access"
+    ]
+  },
+  "moh_questions": [
+    "What is the CCSS IT governance and budget timeline for EDUS development in 2026–2027 — is DAK ANC content integration feasible within the current roadmap?",
+    "Is there an automated data flow from EDUS to SIVEI for ANC-specific indicators? If not, is a CCSS-MoH interinstitutional agreement underway under the 2023-2033 National Digital Health Policy?",
+    "Is the CCSS 2022 ANC Protocol update planned, and does EDUS clinical decision support currently implement the WHO 2016 8-contact ANC model?",
+    "What is the HL7 FHIR and SNOMED CT implementation timeline for EDUS, and should DAK integration be designed against the current or future EDUS data model?",
+    "Which of the 105 health areas have the largest gap between ANC4+ coverage and ANC quality metrics, and is this data available from EDUS or SIVEI?",
+    "What are the documented EDUS failure modes and resilience mechanisms following the 2022 ransomware attack, and how would DAK integration be protected during similar events?",
+    "Does CCSS have an existing collaboration or technical relationship with WHO PAHO for DAK/SMART Guidelines review? What is the relevant technical contact within CCSS for ANC digital content?"
+  ]
+}

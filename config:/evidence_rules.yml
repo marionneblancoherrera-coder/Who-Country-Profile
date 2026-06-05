@@ -1,0 +1,261 @@
+# evidence_rules.yml
+# WHO DAK Intelligence Platform — config/evidence_rules.yml
+# Rules for classifying evidence type, cross-checking sources,
+# and handling contradictions and silence.
+# evidence_classifier.py reads this file exclusively.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+principles:
+  - evidence_type_must_be_explicit_on_every_claim
+  - official_silence_is_not_evidence_of_absence
+  - contradictions_are_findings_not_errors
+  - cross_check_is_mandatory_not_optional
+  - retrieval_failure_must_be_distinguished_from_data_absence
+
+# ============================================================
+# EVIDENCE TYPES
+# Every claim in the output carries exactly one evidence type.
+# ============================================================
+evidence_types:
+
+  fact:
+    definition: >
+      Datum directly retrieved from a Tier 1 or Tier 2 source,
+      with URL, access date, and no active contradiction from
+      another same-tier source.
+    compact_code: "F"
+    confidence_floor: verified
+    requirements:
+      - source_tier: [T1_equivalent, T2_equivalent]
+      - retrieval_state: [parsed, validated]
+      - access_date: required
+      - contradiction_check: passed
+
+  inference:
+    definition: >
+      Value derived from one or more facts using explicit documented
+      logic. The derivation chain must be stated.
+    compact_code: "INF"
+    confidence_floor: inferred
+    requirements:
+      - source_facts: "≥1 fact required as input"
+      - derivation_logic: required
+    examples:
+      - "fragmentation_index derived from parallel_ehr_count + governance_autonomy score"
+      - "dak_target_system derived from poc_system_type + poc_maintainer + transition_state"
+      - "b2_priming signals derived from b1 indicator values"
+
+  operational_heuristic:
+    definition: >
+      Probabilistic signal based on documented historical correlation.
+      Not verified for this specific country in this run.
+      Confidence score from donor_signals.yml or country_taxonomy.yml.
+      Must be verified in Block 2 retrieval.
+    compact_code: "OH"
+    confidence_floor: inferred
+    requirements:
+      - heuristic_source: "donor_signals.yml or country_taxonomy.yml"
+      - confidence_score: required
+      - verify_in_b2: true
+    examples:
+      - "Global Fund active → DHIS2 likely (confidence 0.82)"
+      - "PEPFAR active + HIV domain → OpenMRS likely (confidence 0.68)"
+      - "federal governance → fragmentation_index > 5 anticipated"
+
+  contradicted:
+    definition: >
+      Two or more Tier 1 or Tier 2 sources disagree on the same
+      field or dimension. Both values must be recorded.
+      Resolution is prohibited — contradiction is the output.
+    compact_code: "C"
+    confidence_floor: CONTRADICTED
+    requirements:
+      - source_a: required
+      - source_b: required
+      - dimension_a_measures: required
+      - dimension_b_measures: required
+    rule: >
+      When sources disagree, determine whether they measure the
+      same dimension or different sub-dimensions of the same concept.
+      If same dimension: flag CONTRADICTED, record both, do not resolve.
+      If different sub-dimensions: record both as facts with labels.
+      Italy FSE example: "broken" (interoperability sub-dimension)
+      and "fast tracker" (adoption sub-dimension) are both facts,
+      not a contradiction — label each correctly.
+
+  unresolved:
+    definition: >
+      Field not populated after exhausting all category-appropriate
+      sources. Sources attempted must be documented.
+    compact_code: "U"
+    confidence_floor: unknown
+    requirements:
+      - sources_attempted: "list of URLs and retrieval states"
+      - retrieval_states: required
+    rule: >
+      An unresolved field with documented attempts is more
+      informative than a missing field. Always record what
+      was tried and why it failed.
+
+# ============================================================
+# CROSS-CHECK RULES
+# When and how to run mandatory source cross-checks.
+# ============================================================
+cross_check_rules:
+
+  mandatory_t2_after_t3:
+    trigger: "Any Tier 3 (national_government) source retrieved"
+    action: >
+      Run PubMed query using official_silence template from
+      source_hierarchy.yml before marking any T3 field as final.
+    rationale: >
+      National government sources systematically suppress:
+      adoption failures, integration gaps, interoperability problems.
+      Empirical evidence: Switzerland EPD 1.3% real adoption absent
+      from e-health-suisse.ch; Zambia SmartCare-DHIS2 gap absent
+      from all MoH documents; Italy FSE interoperability failure
+      absent from fascicolosanitario.gov.it.
+    failure_to_run: >
+      If T2 query not run after T3 retrieval, downgrade all
+      T3-sourced fields from inferred to inferred-weak.
+
+  mandatory_q1_for_adoption:
+    trigger: "poc_real_adoption field being populated"
+    action: >
+      Run PubMed adoption_barriers query regardless of source tier.
+    rationale: >
+      Real adoption figures are almost never in official sources.
+      Switzerland lesson: official sources reported legal mandate;
+      real adoption (1.3%) appeared only in PMC + Tier 5 news.
+    query_template: "adoption_barriers (from source_hierarchy.yml T2 query templates)"
+
+  mandatory_q1_for_integration:
+    trigger: "poc_hmis_integration field being populated"
+    action: >
+      Run PubMed integration_gaps query after any official source.
+    rationale: >
+      Integration gaps are systematically absent from official docs.
+      Zambia SmartCare-DHIS2 gap: absent from MoH, present in PMC.
+      Costa Rica EDUS-SIVEI gap: present in PAHO (Tier 1 exception),
+      absent from CCSS official website.
+
+  contradiction_detection:
+    trigger: "Two sources retrieved for the same field"
+    action: >
+      Compare values. If different:
+        1. Determine if same dimension or different sub-dimensions.
+        2. Same dimension → apply CONTRADICTED evidence type.
+        3. Different sub-dimensions → record both as facts with labels.
+        4. Never silently choose one value.
+    output_format: >
+      contradicted_field:
+        value_a: [value]
+        source_a: [url]
+        dimension_a: [what it measures]
+        value_b: [value]
+        source_b: [url]
+        dimension_b: [what it measures]
+
+# ============================================================
+# OFFICIAL SILENCE POLICY
+# When absence of evidence ≠ evidence of absence.
+# ============================================================
+official_silence_policy:
+
+  definition: >
+    Official sources (Tier 3 national_government) systematically
+    omit certain categories of operational reality.
+    Absence of a finding in an official source is not evidence
+    that the finding does not exist.
+
+  known_silence_categories:
+    adoption_failures:
+      description: "Real-world system adoption below nominal coverage"
+      examples:
+        - "Switzerland EPD: 1.3% real adoption not in e-health-suisse.ch"
+        - "Zambia SmartCare: rural non-use not in MoH documents"
+      handling: "Run mandatory_q1_for_adoption cross-check"
+
+    integration_gaps:
+      description: "Missing or broken inter-system data flows"
+      examples:
+        - "Zambia SmartCare-DHIS2: gap in PMC, absent from all official docs"
+        - "Costa Rica EDUS-SIVEI: gap in PAHO, absent from CCSS website"
+      handling: "Run mandatory_q1_for_integration cross-check"
+
+    implementation_failures:
+      description: "Systems deployed but not operationally functional"
+      examples:
+        - "Italy FSE interoperability: official site reports coverage, not function"
+      handling: "Run official_silence PubMed query from source_hierarchy.yml"
+
+    system_absence_from_registries:
+      description: "Major national systems not listed in WHO registries"
+      examples:
+        - "Costa Rica EDUS: absent from WHO Digital Health Atlas, Digital Square"
+        - "China 4631-2: absent from WHO registries"
+      handling: >
+        DO NOT conclude system does not exist if not in WHO registry.
+        Use category_catalog.yml sources for the country's profile type.
+
+  who_digital_health_atlas_rule: >
+    WHO Digital Health Atlas uses JavaScript rendering.
+    Empty response = js_blocked, not evidence of no digital systems.
+    Document retrieval state as js_blocked and use fallback sources.
+
+# ============================================================
+# FRAGILE STATE MODIFIER
+# Applied when country is on World Bank FCS list.
+# ============================================================
+fragile_state_modifier:
+  source: "World Bank Fragile and Conflict-affected Situations list"
+  url: "worldbank.org/en/topic/fragilityconflictviolence/brief/harmonized-list-of-fragile-situations"
+  effects:
+    - flag: FRAGILE_STATE_ESTIMATE
+      applied_to: "all domain indicators"
+    - reliability_penalty: -0.15
+    - indicator_note: >
+        WHO GHO figures for fragile states are modelled estimates
+        with wide confidence intervals, not direct measurements.
+    - b2_block_rule: >
+        If b1_reliability_score < 0.50 after fragile state penalty,
+        Block 2 does not execute. Output: skeleton profile + gap map.
+
+# ============================================================
+# SURVEY AGE MODIFIER
+# Applied when most recent household survey is outdated.
+# ============================================================
+survey_age_modifier:
+  threshold_years: 4
+  sources_affected: [DHS, MICS, national_household_survey]
+  effects:
+    - flag: SURVEY_AGE_WARNING
+      applied_to: "all survey-sourced domain indicators"
+    - reliability_penalty: -0.08
+    - field_note: >
+        Include survey year in output alongside the value.
+        Example: "ANC4+ 76% (DHS 2018 — survey age warning)"
+
+# ============================================================
+# BLOCK EXECUTION GATE
+# ============================================================
+block_execution_gate:
+  b2_requires_b1_score: 0.50
+  rule: >
+    If b1_reliability_score < 0.50, Block 2 does not execute.
+    Output is: skeleton profile, evidence gap map, and
+    recommended source actions for human follow-up.
+    This threshold reflects minimum context required for
+    digital landscape analysis to be meaningful.
+
+# ============================================================
+# VERSIONING
+# ============================================================
+versioning:
+  rules_version: "1.0.0"
+  change_policy:
+    major_version: "Core cross-check rules or evidence type definitions changed"
+    minor_version: "New silence category or modifier added"
+    patch_version: "Examples, wording, or threshold update"

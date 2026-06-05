@@ -1,0 +1,406 @@
+# source_hierarchy.yml
+# WHO DAK Intelligence Platform — config/source_hierarchy.yml
+# Evidence governance framework.
+# evidence_classifier.py and confidence.py read this file.
+# Retrieval orchestration lives in sources/category_catalog.yml
+# Skepticism and cross-check rules live in config/evidence_rules.yml
+# ============================================================
+schema_version: "2.0.0"
+last_reviewed: "2026-05-25"
+maintainer: "WHO DAK Intelligence — NLP Project USI 2026"
+
+principles:
+  - evidence_dimensions_over_linear_tiers
+  - operational_visibility_separate_from_authority
+  - neutrality_over_editorialization
+  - traceability_required
+  - unresolved_states_preserved
+  - retrieval_behavior_separated_from_source_types
+  - descriptive_over_normative
+
+# ============================================================
+# SOURCE TYPES
+# Describe evidence origin. Do not determine truth.
+# ============================================================
+source_types:
+
+  global_normative:
+    label: "Global normative and monitoring sources"
+    description: >
+      International institutional sources providing global,
+      regional, or national indicators, strategic guidance,
+      or policy monitoring.
+    examples: [WHO, UNICEF, "World Bank", UNAIDS, PAHO, IDB, OECD, GAVI, "Global Fund"]
+    strengths:
+      - institutional authority
+      - broad comparability
+      - stable publication infrastructure
+    limitations:
+      - may lag behind implementation reality
+      - may contain modelled or estimated indicators
+      - operational granularity often limited
+
+  national_government:
+    label: "National and subnational government sources"
+    description: >
+      Official government publications, strategies, policies,
+      reports, registries, and portals.
+    examples: ["Ministry of Health portals", "National eHealth agencies", "National statistics offices"]
+    strengths:
+      - official implementation intent
+      - policy authority
+      - direct governance relevance
+    limitations:
+      - operational implementation detail varies
+      - adoption and interoperability metrics frequently incomplete
+      - publication update quality varies
+    operational_note: >
+      See evidence_rules.yml for cross-check policies.
+      Authority does not guarantee operational accuracy.
+
+  peer_reviewed_research:
+    label: "Peer-reviewed scientific literature"
+    description: >
+      Implementation studies, operational research, evaluations,
+      epidemiological analysis. Indexed in PMC/PubMed.
+    target_journals:
+      - "JMIR Medical Informatics"
+      - "Lancet Digital Health"
+      - "Lancet Regional Health (all editions)"
+      - "Digital Health (SAGE)"
+      - "npj Digital Medicine"
+      - "BMC Health Services Research"
+      - "Health Policy and Systems"
+    strengths:
+      - methodological transparency
+      - peer review
+      - surfaces operational reality official sources suppress
+    limitations:
+      - publication lag
+      - geographic and publication bias
+      - variable operational scope
+
+  implementation_documentation:
+    label: "Implementation community and registry documentation"
+    description: >
+      Technical material from implementation partners, digital health
+      communities, interoperability initiatives, platform maintainers.
+    examples: ["OpenHIE country wiki", "DHIS2 community", "Digital Square", "OpenMRS implementations"]
+    strengths:
+      - operational proximity
+      - technical ecosystem visibility
+    limitations:
+      - variable methodological rigour
+      - inconsistent long-term preservation
+      - partial ecosystem visibility
+    operational_note: >
+      Verify last-edited date before citing.
+      Outdated entries should not be treated as current evidence.
+
+  programme_and_operational_reviews:
+    label: "Programme reviews, assessments, and operational evaluations"
+    description: >
+      Programme reviews, readiness analyses, implementation audits.
+    strengths:
+      - implementation realism
+      - operational barrier visibility
+    limitations:
+      - variable peer review status
+      - temporal relevance declines rapidly
+
+  grey_literature:
+    label: "Grey literature and specialist secondary sources"
+    description: >
+      Non-peer-reviewed material including specialist news,
+      industry reports, institutional blogs.
+    strengths:
+      - rapid availability
+      - may surface data official sources suppress
+    limitations:
+      - uncertain methodological rigour
+      - limited reproducibility
+    operational_note: >
+      Use as discovery path, not primary evidence.
+      Cite the primary source the article references.
+
+# ============================================================
+# EVIDENCE DIMENSIONS
+# Multi-dimensional quality assessment.
+# No single dimension determines confidence.
+# ============================================================
+evidence_dimensions:
+
+  authority:
+    description: "Institutional legitimacy or formal governance relevance."
+    levels: [low, medium, high]
+
+  operational_visibility:
+    description: "Degree to which the source reflects real-world implementation."
+    levels: [low, medium, high]
+    note: >
+      Operational visibility is independent from authority.
+      High-authority sources (WHO) may have low operational visibility.
+      Community documentation may have high operational visibility
+      with lower authority. Both dimensions are required.
+
+  methodological_rigour:
+    description: "Transparency and robustness of methods."
+    levels: [low, medium, high]
+
+  recency:
+    description: "Temporal proximity to current implementation reality."
+    levels: [stale, recent, current]
+    thresholds:
+      current: "≤ 2 years from retrieval date"
+      recent: "2–4 years from retrieval date"
+      stale: "> 4 years from retrieval date"
+
+  reproducibility:
+    description: "Ability to independently validate or reproduce findings."
+    levels: [low, medium, high]
+
+  implementation_proximity:
+    description: "Closeness to operational deployment environments."
+    levels: [indirect, partial, direct]
+
+# ============================================================
+# CONFIDENCE MODEL
+# Emerges from multiple dimensions. Not a tier lookup.
+# ============================================================
+confidence_model:
+
+  dimensions_required: [authority, operational_visibility, methodological_rigour, recency]
+  dimensions_supporting: [reproducibility, implementation_proximity, corroboration]
+
+  confidence_levels:
+
+    high:
+      compact_code: "V"
+      label: "verified"
+      definition: >
+        Multiple recent, corroborated, methodologically transparent
+        sources support the finding. No active contradictions in
+        same-tier sources.
+      typical_source_profile: >
+        global_normative or peer_reviewed_research,
+        recency=current, corroborated by ≥1 independent source
+
+    medium:
+      compact_code: "I"
+      label: "inferred"
+      definition: >
+        Partially corroborated, single-source, or recent
+        but from lower operational-visibility sources.
+      typical_source_profile: >
+        national_government or implementation_documentation,
+        recency=recent or current, not independently corroborated
+
+    low:
+      compact_code: "IW"
+      label: "inferred-weak"
+      definition: >
+        Stale, single-source, limited methodological transparency,
+        or grey literature only.
+      typical_source_profile: >
+        grey_literature, recency=stale,
+        or implementation_documentation with outdated last-edit
+
+    unresolved:
+      compact_code: "U"
+      label: "unknown"
+      definition: >
+        Insufficient evidence to characterise.
+        Sources were attempted; retrieval states recorded.
+      rule: >
+        A field marked unknown with documented source attempts
+        is more valuable than a missing field.
+        Always record attempted sources and their retrieval states.
+
+    contradicted:
+      compact_code: "C"
+      label: "CONTRADICTED"
+      definition: >
+        Two or more same-tier sources disagree on the same field.
+      rule: >
+        Never resolve by choosing one source.
+        Record both values, both sources, and the dimension each addresses.
+        The contradiction is itself a finding.
+      example_from_runs: >
+        Italy FSE 2025: Lancet "fundamentally broken" (interoperability dim)
+        vs PMC11927704 "EU-27 fast tracker" (adoption dim).
+        Both T2. Both correct. Both recorded.
+
+  # Legacy alias for backward compatibility with v1 classifier code
+  legacy_tier_mapping:
+    T1_equivalent: "global_normative → high confidence default"
+    T2_equivalent: "peer_reviewed_research → high confidence default"
+    T3_equivalent: "national_government → medium confidence default"
+    T4_equivalent: "implementation_documentation → medium confidence default"
+    T5_equivalent: "grey_literature → low confidence default"
+
+# ============================================================
+# CORROBORATION MODEL
+# ============================================================
+corroboration_model:
+  independent_confirmation_preferred: true
+  operational_crosschecks_encouraged: true
+  contradictions_preserved: true
+  absence_is_not_nonexistence: true
+
+  contradiction_handling:
+    preserve_all_claims: true
+    require_source_traceability: true
+    prohibit_silent_resolution: true
+
+# ============================================================
+# RETRIEVAL STATES
+# Lifecycle states for each source access attempt.
+# http_client.py and retrieval_engine.py use these values.
+# ============================================================
+retrieval_states:
+
+  discovered:
+    definition: "Source identified but not yet accessed."
+    compact_code: "DS"
+
+  accessible:
+    definition: "Source reachable and responding."
+    compact_code: "AC"
+
+  parsed:
+    definition: "Content successfully extracted and usable."
+    compact_code: "PA"
+
+  partially_parsed:
+    definition: "Partial extraction succeeded; some sections failed."
+    compact_code: "PP"
+
+  validated:
+    definition: "Content reviewed and considered usable for citation."
+    compact_code: "VA"
+
+  landing_page_only:
+    definition: >
+      Landing, catalog, or download page reached but underlying
+      document or dataset not yet retrieved.
+    compact_code: "LP"
+    rule: >
+      A landing page cannot be cited as a reviewed source.
+      The underlying PDF, dataset, or full-text HTML must be fetched.
+
+  js_blocked:
+    definition: "Access prevented by JavaScript or dynamic rendering."
+    compact_code: "JS"
+    known_cases: ["WHO Digital Health Atlas (digitalhealthatlas.org)"]
+    rule: >
+      js_blocked is access failure, not evidence of absence.
+      Use category_catalog.yml fallback sources.
+
+  paywalled:
+    definition: "Source requires subscription or restricted access."
+    compact_code: "PW"
+
+  machine_unreadable:
+    definition: "Source accessible but not extractable by automated tools."
+    compact_code: "MR"
+
+  translation_required:
+    definition: >
+      Source requires translation before evaluation.
+      Language noted in retrieval log.
+    compact_code: "TR"
+    operational_note: >
+      Chinese, Arabic, and Portuguese-language sources are frequently
+      the most operationally informative for SOVEREIGN category countries.
+
+  network_failed:
+    definition: "DNS error, timeout, or network failure."
+    compact_code: "NF"
+
+  request_failed:
+    definition: "HTTP error (4xx, 5xx) on accessible domain."
+    compact_code: "RF"
+
+  inaccessible:
+    definition: "Source unreachable by any attempted method."
+    compact_code: "IA"
+
+  superseded:
+    definition: "Source replaced by newer authoritative material."
+    compact_code: "SU"
+
+# ============================================================
+# EVIDENCE GOVERNANCE
+# ============================================================
+evidence_governance:
+  requirements:
+    - all_substantive_claims_require_source_type_and_retrieval_state
+    - retrieval_failures_recorded_with_state_and_timestamp
+    - unresolved_states_preserved_not_hidden
+    - contradictions_recorded_not_resolved
+    - publication_and_retrieval_dates_required_when_available
+
+  prohibited_patterns:
+    - automatic_truth_from_source_category
+    - silent_conflict_resolution
+    - absence_inferred_from_failed_retrieval
+    - editorial_claims_without_traceability
+    - geopolitical_interpretation_inside_source_types
+
+# ============================================================
+# EXAMPLE EVIDENCE PROFILES (illustrative)
+# ============================================================
+example_evidence_profiles:
+
+  WHO_dashboard_indicator:
+    authority: high
+    operational_visibility: medium
+    methodological_rigour: high
+    reproducibility: high
+    implementation_proximity: indirect
+    typical_confidence: high
+
+  facility_implementation_study:
+    authority: medium
+    operational_visibility: high
+    methodological_rigour: medium
+    reproducibility: medium
+    implementation_proximity: direct
+    typical_confidence: medium
+
+  national_digital_health_strategy:
+    authority: high
+    operational_visibility: medium
+    methodological_rigour: medium
+    reproducibility: medium
+    implementation_proximity: partial
+    typical_confidence: medium
+
+  community_implementation_documentation:
+    authority: medium
+    operational_visibility: high
+    methodological_rigour: low
+    reproducibility: low
+    implementation_proximity: direct
+    typical_confidence: medium
+
+# ============================================================
+# OPERATIONAL LINKAGES (referenced, not embedded)
+# ============================================================
+operational_linkages:
+  retrieval_policy: "sources/category_catalog.yml"
+  skepticism_and_crosscheck: "config/evidence_rules.yml"
+  risk_engine: "config/risk_definitions.yml"
+  heuristics: "config/donor_signals.yml"
+
+# ============================================================
+# VERSIONING
+# ============================================================
+versioning:
+  hierarchy_version: "2.0.0"
+  confidence_model_version: "1.0"
+  retrieval_state_model_version: "1.0"
+  change_policy:
+    major_version: "Structural redesign of dimensions, ontology, or governance"
+    minor_version: "New source types, dimensions, or retrieval states"
+    patch_version: "Clarifications, wording, or metadata updates"

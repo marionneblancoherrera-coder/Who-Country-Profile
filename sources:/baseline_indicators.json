@@ -1,0 +1,126 @@
+{
+  "version": "1.0.0",
+  "last_reviewed": "2026-05-25",
+  "description": "Controlled baseline indicators for deterministic retrieval. Keep this list small. Values provide context only — not proof of profile completeness.",
+  "apis": {
+    "world_bank": "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100",
+    "who_gho":    "https://ghoapi.azureedge.net/api/{CODE}"
+  },
+  "indicators": [
+    {
+      "id": "population",
+      "source": "world_bank", "code": "SP.POP.TOTL",
+      "label": "Population, total", "unit": "people",
+      "profile_section": "country_context", "recency_threshold_years": 3
+    },
+    {
+      "id": "life_expectancy",
+      "source": "world_bank", "code": "SP.DYN.LE00.IN",
+      "label": "Life expectancy at birth (years)", "unit": "years",
+      "profile_section": "population_health", "recency_threshold_years": 3
+    },
+    {
+      "id": "health_expenditure_per_capita",
+      "source": "world_bank", "code": "SH.XPD.CHEX.PC.CD",
+      "label": "Current health expenditure per capita (USD)", "unit": "current USD",
+      "profile_section": "health_financing", "recency_threshold_years": 3
+    },
+    {
+      "id": "out_of_pocket_pct",
+      "source": "world_bank", "code": "SH.XPD.OOPC.CH.ZS",
+      "label": "Out-of-pocket expenditure (% current health expenditure)", "unit": "percent",
+      "profile_section": "health_financing", "recency_threshold_years": 3,
+      "dak_relevance": "High OOP signals financial access barriers affecting care-seeking"
+    },
+    {
+      "id": "physician_density",
+      "source": "world_bank", "code": "SH.MED.PHYS.ZS",
+      "label": "Physicians per 1,000 people", "unit": "per 1,000",
+      "profile_section": "workforce", "recency_threshold_years": 5,
+      "b2_signal": "density < 0.2 → RISK_LOW_OPERATOR_CAPACITY"
+    },
+    {
+      "id": "hospital_beds",
+      "source": "world_bank", "code": "SH.MED.BEDS.ZS",
+      "label": "Hospital beds per 1,000 people", "unit": "per 1,000",
+      "profile_section": "workforce", "recency_threshold_years": 5
+    },
+    {
+      "id": "basic_sanitation",
+      "source": "world_bank", "code": "SH.STA.BASS.ZS",
+      "label": "Population using basic sanitation (%)", "unit": "percent",
+      "profile_section": "environmental_health", "recency_threshold_years": 3
+    },
+    {
+      "id": "basic_water",
+      "source": "world_bank", "code": "SH.H2O.BASW.ZS",
+      "label": "Population using basic drinking water (%)", "unit": "percent",
+      "profile_section": "environmental_health", "recency_threshold_years": 3
+    },
+    {
+      "id": "uhc_index",
+      "source": "world_bank", "code": "SH.UHC.SRVS.CV.XD",
+      "label": "UHC service coverage index (0–100)", "unit": "index",
+      "profile_section": "healthcare_access", "recency_threshold_years": 3
+    },
+    {
+      "id": "dtp3_coverage",
+      "source": "who_gho", "code": "WHS4_100",
+      "label": "DTP3 immunization coverage among 1-year-olds (%)", "unit": "percent",
+      "profile_section": "healthcare_access", "recency_threshold_years": 3,
+      "domains": ["Immunization"],
+      "notes": "WHO/UNICEF WUENIC estimates"
+    },
+    {
+      "id": "mcv1_coverage",
+      "source": "who_gho", "code": "WHS8_110",
+      "label": "MCV1 coverage among 1-year-olds (%)", "unit": "percent",
+      "profile_section": "healthcare_access", "recency_threshold_years": 3,
+      "domains": ["Immunization"]
+    },
+    {
+      "id": "mcv2_coverage",
+      "source": "who_gho", "code": "MCV2",
+      "label": "MCV2 coverage by nationally recommended age (%)", "unit": "percent",
+      "profile_section": "healthcare_access", "recency_threshold_years": 3,
+      "domains": ["Immunization"]
+    },
+    {
+      "id": "maternal_mortality_ratio",
+      "source": "who_gho", "code": "MDG_0000000026",
+      "label": "Maternal mortality ratio (per 100,000 live births)", "unit": "per 100,000",
+      "profile_section": "population_health", "recency_threshold_years": 3,
+      "domains": ["ANC"],
+      "conflict_note": "WHO GHO uses UN MMEIG modelled estimates. DHS uses survey-direct figures. Apply CONTRADICTED if both retrieved and values differ."
+    },
+    {
+      "id": "skilled_birth_attendance",
+      "source": "who_gho", "code": "MDG_0000000025",
+      "label": "Births attended by skilled health personnel (%)", "unit": "percent",
+      "profile_section": "healthcare_access", "recency_threshold_years": 3,
+      "domains": ["ANC"]
+    },
+    {
+      "id": "hiv_art_coverage",
+      "source": "who_gho", "code": "HIV_0000000026",
+      "label": "ART coverage among people living with HIV (%)", "unit": "percent",
+      "profile_section": "healthcare_access", "recency_threshold_years": 3,
+      "domains": ["HIV"],
+      "alt_source": "unaids.org/en/regionscountries/{country}"
+    },
+    {
+      "id": "tb_incidence",
+      "source": "who_gho", "code": "TB_1",
+      "label": "TB incidence rate (per 100,000 population)", "unit": "per 100,000",
+      "profile_section": "population_health", "recency_threshold_years": 3,
+      "domains": ["TB"],
+      "alt_source": "WHO Global TB Report (annual PDF)"
+    }
+  ],
+  "retrieval_notes": {
+    "world_bank_latest": "Use latest non-empty value — sort by year descending, take first non-null",
+    "who_gho_filter": "Filter by SpatialDim = ISO3. If zero rows: status = missing_value (not absent — indicator may exist but lack country data)",
+    "missing_value": "missing_value ≠ not_applicable. Record attempted URL and zero-row result as evidence gap.",
+    "high_income_anc": "ANC4+ from UNICEF unavailable for high-income countries. Use DHS or national statistics."
+  }
+}

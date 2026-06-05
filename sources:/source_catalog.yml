@@ -1,0 +1,194 @@
+# source_catalog.yml
+# WHO DAK Intelligence Platform — sources/source_catalog.yml
+# What sources exist and what they can provide.
+# Does NOT specify when to use them — that is retrieval_strategy.yml.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+sources:
+
+  unicef_country:
+    label: "UNICEF country statistics"
+    url_template: "https://data.unicef.org/country/{ISO2}/"
+    source_type: global_normative
+    capabilities: [maternal_health, child_health, immunization_coverage, domain_indicators]
+    access: open
+    format: html
+    crosscheck_required: false
+    note: "ANC4+ unavailable for high-income countries — use DHS or national statistics instead"
+
+  world_bank_api:
+    label: "World Bank Open Data API"
+    url_template: "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100"
+    source_type: global_normative
+    capabilities: [health_expenditure, physician_density, hospital_beds, sanitation, water, uhc_index]
+    access: open
+    format: json_api
+
+  who_gho_api:
+    label: "WHO Global Health Observatory OData API"
+    url_template: "https://ghoapi.azureedge.net/api/{CODE}"
+    source_type: global_normative
+    capabilities: [maternal_mortality, immunization_coverage, hiv_indicators, tb_indicators, workforce]
+    access: open
+    format: json_api
+
+  global_fund_portfolio:
+    label: "Global Fund country portfolio"
+    url_template: "https://www.theglobalfund.org/en/portfolio/{COUNTRY_SLUG}/"
+    source_type: global_normative
+    capabilities: [donor_presence, digital_health_investment, facility_coverage, active_grants]
+    access: open
+    format: html
+    crosscheck_required: false
+
+  pepfar_country:
+    label: "PEPFAR country programme page"
+    url_template: "https://www.pepfar.gov/countries/{COUNTRY_SLUG}/"
+    source_type: global_normative
+    capabilities: [donor_presence, hiv_programme_investment]
+    access: open
+    format: html
+
+  gavi_eligibility:
+    label: "Gavi eligibility list"
+    url_template: "https://www.gavi.org/support/process/apply/eligibility/"
+    source_type: global_normative
+    capabilities: [gavi_eligible]
+    access: open
+    format: html
+
+  paho_country:
+    label: "PAHO country page"
+    url_template: "https://www.paho.org/en/countries/{COUNTRY_SLUG}"
+    source_type: global_normative
+    capabilities: [health_system_structure, ehr_mentions, interoperability_status, domain_indicators]
+    access: open
+    format: html
+    regions: [AMRO, Americas]
+
+  idb_publications:
+    label: "IDB technical notes and publications"
+    url_template: "https://publications.iadb.org/en/search#q={COUNTRY_NAME}+digital+health"
+    source_type: global_normative
+    capabilities: [national_ehr_details, digital_adoption, system_coverage, poc_maintainer]
+    access: open
+    format: html
+    regions: [AMRO, Americas]
+    note: "Often the only source documenting centralized national EHRs absent from WHO registries"
+
+  who_euro_observatory:
+    label: "WHO European Health Observatory country profiles"
+    url_template: "https://eurohealthobservatory.who.int/countries/{COUNTRY_SLUG}"
+    source_type: global_normative
+    capabilities: [health_system_structure, decentralization, ehr_fragmentation, expenditure]
+    access: open
+    format: html
+    regions: [EURO]
+
+  ecdc_country:
+    label: "ECDC country surveillance profile"
+    url_template: "https://www.ecdc.europa.eu/en/countries/{COUNTRY_SLUG}"
+    source_type: global_normative
+    capabilities: [surveillance_systems, data_connection, disease_burden]
+    access: open
+    format: html
+    regions: [EURO]
+
+  ohie_country_wiki:
+    label: "OpenHIE country community wiki"
+    url_template: "https://wiki.ohie.org/display/CP/{COUNTRY_NAME}"
+    source_type: implementation_documentation
+    capabilities: [poc_system, hmis_platform, interoperability_architecture, global_goods_active]
+    access: open
+    format: html
+    crosscheck_required: true
+    staleness_check: true
+    staleness_threshold_months: 18
+
+  digital_square_guidebook:
+    label: "Digital Square Global Goods Guidebook"
+    url_template: "https://digitalsquare.org/global-goods-guidebook"
+    source_type: implementation_documentation
+    capabilities: [global_goods_active, country_deployments]
+    access: open
+    format: pdf
+
+  dhis2_in_action:
+    label: "DHIS2 in-action deployment registry"
+    url_template: "https://dhis2.org/in-action/"
+    source_type: implementation_documentation
+    capabilities: [dhis2_active, ministry_using, version, country_deployments]
+    access: open
+    format: html
+
+  exemplars_health:
+    label: "Exemplars in Global Health"
+    url_template: "https://www.exemplars.health/search?q={COUNTRY_NAME}"
+    source_type: programme_and_operational_reviews
+    capabilities: [real_world_digital_use, system_performance, implementation_context]
+    access: open
+    format: html
+
+  gdhi_project:
+    label: "Global Digital Health Index"
+    url_template: "https://www.gdhi-project.org/countries/{COUNTRY_NAME}"
+    source_type: programme_and_operational_reviews
+    capabilities: [digital_maturity_score, dimension_breakdown]
+    access: open
+    format: html
+
+  path_resources:
+    label: "PATH digital health resources"
+    url_template: "https://www.path.org/resources/?q={COUNTRY_NAME}+digital+health"
+    source_type: programme_and_operational_reviews
+    capabilities: [poc_maintainer, system_in_transition, implementation_context]
+    access: open
+    format: html
+
+  national_ehealth_agency:
+    label: "National eHealth agency website"
+    url_template: "discover via web search: '{COUNTRY_NAME} national eHealth agency'"
+    source_type: national_government
+    capabilities: [ehr_legal_status, transition_roadmap, nominal_coverage, mandate]
+    access: open
+    format: html
+    crosscheck_required: true
+    bias: "reports legal progress and successes — real adoption data requires Q1 cross-check"
+
+  national_moh:
+    label: "Ministry of Health official website"
+    url_template: "discover via web search: '{COUNTRY_NAME} Ministry of Health official'"
+    source_type: national_government
+    capabilities: [national_guidelines, official_system_name, coverage_claims, policy]
+    access: open
+    format: html
+    crosscheck_required: true
+    bias: "reports successes only — integration gaps and adoption failures require Q1 cross-check"
+
+  pubmed_pmc:
+    label: "PubMed / PMC peer-reviewed literature"
+    url_template: "https://pubmed.ncbi.nlm.nih.gov/?term={QUERY}"
+    source_type: peer_reviewed_research
+    capabilities: [adoption_barriers, integration_gaps, implementation_failures, real_adoption, quality_gaps]
+    access: open
+    format: html
+    note: "Primary source for what official sources suppress. See query_templates.yml for intents."
+
+  who_gidh:
+    label: "WHO Global Initiative on Digital Health"
+    url_template: "https://www.who.int/publications/m/item/global-initiative-on-digital-health"
+    source_type: global_normative
+    capabilities: [who_country_collaboration, gidh_partnership, sovereign_country_context]
+    access: open
+    format: html
+
+  grey_literature_search:
+    label: "Specialist news / grey literature (Tier 5)"
+    url_template: "web search: '{COUNTRY_NAME} {EHR_NAME} adoption {YEAR}'"
+    source_type: grey_literature
+    capabilities: [real_adoption_figures]
+    access: open
+    crosscheck_required: false
+    note: "Last resort only. Cite the primary data source the article references, not the article itself."

@@ -1,0 +1,373 @@
+# risk_definitions.yml
+# WHO DAK Intelligence Platform — config/risk_definitions.yml
+# Operational risk flag definitions and activation conditions.
+# risk_assessor.py reads this file exclusively.
+# New flags = new YAML entry. No script changes required.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+risk_model_version: "1.1"
+empirical_basis: "5-country live execution (May 2026)"
+
+principles:
+  - flags_are_actionable_not_punitive
+  - every_flag_requires_a_mandatory_moh_question
+  - emergent_flags_documented_with_country_of_origin
+  - flags_expire_when_condition_resolves
+  - absence_of_evidence_is_not_evidence_of_absence
+
+# ============================================================
+# BASE FLAGS
+# Evaluated for every country run regardless of category.
+# ============================================================
+base_flags:
+
+  RISK_TRANSITION:
+    label: "System in active transition"
+    category: base
+    origin: "Ghana case — JMIR 2025 (6-month DAK delay)"
+    activation:
+      primary: "system_in_transition = true"
+      supporting_signals:
+        - "OpenHIE wiki contains: migration | transition | replacing | upgrade"
+        - "Global Fund new investment plan includes system change"
+        - "Q1 paper documents active platform replacement"
+        - "New law or decree mandates system change with deadline"
+    severity: high
+    dak_impact: >
+      Integrating DAK into a system being replaced is wasted effort.
+      DAK implementation timeline must be coordinated with
+      transition completion date.
+    mandatory_moh_question: >
+      What is the migration deadline and which system will be in
+      production in 18 months? Should DAK integration wait for
+      the new system?
+    resolve_condition: "Transition confirmed complete in official source."
+
+  RISK_ADOPTION_GAP:
+    label: "Nominal coverage significantly exceeds real adoption"
+    category: base
+    origin: "Switzerland EPD (1.3% adoption vs legal mandate 2022)"
+    activation:
+      primary: "poc_nominal_coverage > 0.80 AND poc_real_adoption < 0.20"
+      supporting_signals:
+        - "Q1 paper documents low uptake or barriers to use"
+        - "Tier 5 source reports adoption figure well below mandate"
+        - "Provider survey documents non-use despite system availability"
+    severity: high
+    dak_impact: >
+      DAK integration in an unused system has zero clinical impact.
+      Understanding adoption barriers is prerequisite to integration.
+    mandatory_moh_question: >
+      What are the documented barriers to adoption? What percentage
+      of facilities actively enter clinical data versus having the
+      system installed but unused?
+    resolve_condition: >
+      poc_real_adoption > 0.60 confirmed by Tier 1 or Tier 2 source.
+
+  RISK_FRAGMENTATION:
+    label: "High system fragmentation without unified governance mandate"
+    category: base
+    origin: "Italy FSE — 20 regional implementations"
+    activation:
+      primary: "fragmentation_score > 6.0 AND no_national_mandate_evidence = true"
+      supporting_signals:
+        - "fragmentation_index > 5 parallel implementations"
+        - "Q1 paper documents regional incompatibility"
+        - "No national body with enforcement authority identified"
+    severity: high
+    dak_impact: >
+      Uniform DAK integration requires n separate implementations
+      negotiated with n separate governance authorities.
+    mandatory_moh_question: >
+      Who has authority to mandate uniform clinical content standards
+      across all regions? Is there a central body that can enforce
+      DAK content adoption?
+    resolve_condition: >
+      National mandate enacted and enforcement mechanism documented.
+
+  RISK_VENDOR_IS_GOVERNMENT:
+    label: "System vendor is the government itself"
+    category: base
+    origin: "Costa Rica EDUS — CCSS as client, developer, and operator"
+    activation:
+      primary: >
+        digital_architecture = proprietary
+        AND poc_maintainer = government_or_national_authority
+      supporting_signals:
+        - "System described as built in-house by MoH or social security"
+        - "No private vendor or open-source community maintaining system"
+        - "Government controls development roadmap and release schedule"
+    severity: medium
+    dak_impact: >
+      Step 4 (software update) requires formal institutional commitment
+      and internal development budget. No vendor can be contracted
+      independently. Political decision required alongside technical.
+    mandatory_moh_question: >
+      Does the institution's IT team have capacity and budget in the
+      2026–2027 roadmap for DAK content integration? Who approves
+      changes to the system — technical leadership or governance board?
+    resolve_condition: "Formal institutional commitment documented."
+
+  RISK_INTEROPERABILITY_GAP:
+    label: "POC system and national HMIS not automatically connected"
+    category: base
+    origin: "Costa Rica EDUS–SIVEI gap (PAHO Tier 1)"
+    activation:
+      primary: >
+        poc_hmis_integration = false
+        AND dak_domain IN [ANC, Immunization, HIV, TB]
+      supporting_signals:
+        - "Two systems operate under different institutions"
+        - "Q1 paper documents manual data extraction between systems"
+        - "Tier 1 source explicitly states systems not connected"
+    severity: medium
+    dak_impact: >
+      DAK indicators captured at point of care will not flow
+      automatically to national surveillance or HMIS reporting.
+      Interinstitutional agreement required in addition to
+      technical integration.
+    mandatory_moh_question: >
+      Is there an automated data flow from [POC system] to [HMIS]
+      for {domain} indicators? If not, is there an existing
+      interinstitutional agreement or is one feasible?
+    resolve_condition: >
+      Automated integration confirmed in Tier 1 or Tier 2 source.
+
+# ============================================================
+# EMERGENT FLAGS
+# Generated from evidence during execution.
+# Each was first observed in a specific country run.
+# ============================================================
+emergent_flags:
+
+  RISK_CANTONAL_DEFECTION:
+    label: "Subnational unit has formally withdrawn from national system"
+    category: emergent
+    origin: "Switzerland — Canton Uri formally abandoned EPD (2025)"
+    activation:
+      primary: >
+        evidence_of_subnational_withdrawal_from_national_system = true
+      supporting_signals:
+        - "Official statement from canton/region/state discontinuing participation"
+        - "Q1 or Tier 5 source documents formal withdrawal"
+    severity: high
+    dak_impact: >
+      If one subnational unit withdraws, others may follow.
+      National system coverage and governance mandate are at risk.
+    mandatory_moh_question: >
+      Are other subnational units considering withdrawal from the
+      national system? What is the national authority's response?
+    applicable_profiles: [HQ_PARADOX, FRAGMENTED]
+
+  RISK_VENDOR_COMPETITION:
+    label: "Multiple incompatible vendor implementations of same national system"
+    category: emergent
+    origin: "Switzerland — Swisscom and Swiss Post EPD systems incompatible"
+    activation:
+      primary: "vendor_fragmentation_signal = true"
+      supporting_signals:
+        - "Two or more private vendors building incompatible implementations"
+        - "Q1 or official source documents incompatibility"
+    severity: high
+    dak_impact: >
+      National interoperability goal is actively undermined by
+      competing vendors. DAK integration target is ambiguous until
+      a dominant standard emerges.
+    mandatory_moh_question: >
+      Which vendor implementation is the national reference standard?
+      Is there a timeline for harmonisation?
+    applicable_profiles: [HQ_PARADOX, FRAGMENTED]
+
+  RISK_DOMAIN_STIGMA:
+    label: "Target population avoids storing domain-specific data due to stigma"
+    category: emergent
+    origin: >
+      Switzerland — women avoid storing gynaecological data in EPD
+      (Q1 Vaud study); general concern for ANC, mental health, HIV domains
+    activation:
+      primary: >
+        Q1_evidence_of_stigma_related_data_avoidance = true
+        AND dak_domain IN [ANC, HIV, mental_health]
+      supporting_signals:
+        - "Q1 paper documents patient reluctance to store sensitive health data"
+        - "Privacy or stigma concern cited in adoption barriers literature"
+    severity: medium
+    dak_impact: >
+      DAK data completeness will be structurally limited by
+      patient data avoidance. Clinical decision support will
+      operate on incomplete records.
+    mandatory_moh_question: >
+      Has the MoH assessed patient willingness to store {domain}
+      data in the national system? Are there privacy configuration
+      options that could address this?
+    applicable_profiles: [HQ_PARADOX, FRAGMENTED, CENTRALIZED]
+
+  RISK_SOUTH_NORTH_DISPARITY:
+    label: "Significant within-country regional disparity in digital implementation"
+    category: emergent
+    origin: "Italy — southern regions systematically lag northern regions"
+    activation:
+      primary: >
+        Q1_evidence_of_regional_implementation_disparity = true
+        AND governance_model IN [federal, hybrid]
+      supporting_signals:
+        - "Q1 paper documents regional performance gap in same national system"
+        - "Recovery plan regions have worse digital outcomes"
+        - "Subnational disaggregation shows >20 percentage point gap"
+    severity: medium
+    dak_impact: >
+      Nationally uniform DAK integration will not produce
+      nationally uniform outcomes. Southern/peripheral regions
+      may need additional implementation support.
+    mandatory_moh_question: >
+      Does the national digital health programme have an equity
+      mechanism for lower-performing regions? How will DAK
+      implementation address subnational disparities?
+    applicable_profiles: [FRAGMENTED]
+
+  GEOGRAPHIC_EQUITY_GAP:
+    label: "High national coverage masks severe urban/rural or regional disparity"
+    category: emergent
+    origin: "China — national ANC coverage 98.2%, rural MMR 36% above urban"
+    activation:
+      primary: >
+        domain_coverage_national > 0.85
+        AND subnational_disparity_evidence = true
+        AND rural_urban_gap_pct > 20
+      supporting_signals:
+        - "Q1 paper documents subnational disaggregation showing large gap"
+        - "DHS or MICS data shows >20 percentage point rural/urban difference"
+    severity: medium
+    dak_impact: >
+      National aggregate coverage does not reflect DAK priority areas.
+      DAK implementation should target underserved geographic segments,
+      not be distributed uniformly based on national averages.
+    mandatory_moh_question: >
+      Which geographic areas or population groups have the largest
+      gap between national average and local {domain} indicators?
+      Should DAK deployment be geographically prioritised?
+    applicable_profiles: [SOVEREIGN, CENTRALIZED, FRAGMENTED]
+
+  QUALITY_COVERAGE_GAP:
+    label: "High nominal coverage coexists with documented quality failure"
+    category: emergent
+    origin: >
+      Costa Rica — 99% ANC institutional delivery,
+      only 4/94 health areas achieve >80% quality prenatal care
+      (NDHS 2023-2030)
+    activation:
+      primary: >
+        domain_coverage_national > 0.85
+        AND quality_gap_evidence = true
+    supporting_signals:
+      - "National strategy or Q1 paper documents quality metrics below coverage"
+      - "Process indicators (ANC4+) high but outcome indicators (MMR) not improving"
+    severity: medium
+    dak_impact: >
+      DAK use case is quality standardisation, not coverage expansion.
+      Decision-support rules and protocol adherence monitoring are
+      more relevant than basic data capture functionality.
+    mandatory_moh_question: >
+      What quality monitoring metrics does the MoH use alongside
+      coverage figures? Which health areas or facilities have the
+      largest quality gap?
+    applicable_profiles: [CENTRALIZED, FRAGMENTED, HQ_PARADOX]
+
+  GUIDELINES_OUTDATED:
+    label: "National clinical guidelines for DAK domain are more than 3 years old"
+    category: emergent
+    origin: "Costa Rica — primary ANC protocol dates from 2009"
+    activation:
+      primary: "national_guidelines_year < current_year - 3"
+      supporting_signals:
+        - "No recent update found in MoH portal or Q1 literature"
+    severity: medium
+    dak_impact: >
+      POC system may have outdated protocol logic embedded.
+      Step 2 of DAK localisation (content review) may need to
+      address guidelines currency before adaptation log can be completed.
+    mandatory_moh_question: >
+      Is a national guidelines update for {domain} planned or underway?
+      Should DAK content alignment wait for updated national guidelines
+      or proceed with current guidelines noting the gap?
+    applicable_profiles: [CENTRALIZED, FRAGMENTED, TARGET_STANDARD]
+
+  RISK_LOW_OPERATOR_CAPACITY:
+    label: "Health workforce density too low to sustain complex digital systems"
+    category: emergent
+    origin: "Derived from domain_indicators.yml b2_routing_signals"
+    activation:
+      primary: >
+        physician_density < 0.2 per 1000
+        OR nurse_midwife_density < 2.0 per 10000
+    severity: medium
+    dak_impact: >
+      Complex EMR systems are not operationally sustainable at
+      primary care level. Low-complexity platforms preferred.
+    mandatory_moh_question: >
+      What digital health systems are currently in active use at
+      primary care level? Is there a community health worker
+      digital platform in operation?
+    applicable_profiles: [TARGET_STANDARD]
+
+  LOCALIZATION_FEASIBILITY_FLAG:
+    label: "Standard 4-step DAK localisation path may not apply"
+    category: emergent
+    origin: "China and Switzerland — confirmed non-standard paths"
+    activation:
+      primary: >
+        derived_operational_profile IN
+        [PROFILE_FEDERAL_FRAGMENTED with international_organisation_host = yes,
+         PROFILE_SOVEREIGN_NATIONAL with source_sovereignty_restriction = true]
+      supporting_signals:
+        - "No active global goods in use"
+        - "Data sovereignty restriction documented"
+        - "No external health donors active"
+    severity: informational
+    dak_impact: >
+      The relevant question is not 'how do we integrate the DAK?'
+      but 'what type of WHO-country collaboration is appropriate?'
+      Generate feasibility note with recommended alternative pathway.
+    mandatory_moh_question: >
+      What type of WHO-country collaboration is planned for {domain}?
+      Is there an existing GIDH or SMART Guidelines partnership?
+      What is the process for aligning national clinical protocols
+      with WHO standards in this country?
+    generate_feasibility_note: true
+    applicable_profiles: [SOVEREIGN, HQ_PARADOX]
+
+# ============================================================
+# FLAG EVALUATION RULES
+# ============================================================
+evaluation_rules:
+
+  evaluate_all_base_flags: true
+  evaluate_emergent_flags_when_evidence_present: true
+  flag_requires_source: true
+  flag_without_source: inferred-weak
+
+  output_requirements:
+    - flag_name
+    - activation_evidence
+    - source_url_or_reference
+    - mandatory_moh_question
+    - severity
+
+  severity_levels:
+    high: "Directly affects DAK integration feasibility or timeline"
+    medium: "Affects implementation approach or expected outcomes"
+    informational: "Context for WHO collaboration pathway"
+
+# ============================================================
+# VERSIONING
+# ============================================================
+versioning:
+  definitions_version: "1.1.0"
+  change_policy:
+    major_version: "Flag removed or activation logic fundamentally changed"
+    minor_version: "New flag added with country-of-origin evidence"
+    patch_version: "Question wording, label, or caveat update"
+  changelog:
+    "1.0.0": "Initial 5 base flags from 5-country empirical analysis"
+    "1.1.0": "Added 8 emergent flags (CANTONAL_DEFECTION, VENDOR_COMPETITION, DOMAIN_STIGMA, SOUTH_NORTH_DISPARITY, GEOGRAPHIC_EQUITY_GAP, QUALITY_COVERAGE_GAP, GUIDELINES_OUTDATED, LOW_OPERATOR_CAPACITY)"

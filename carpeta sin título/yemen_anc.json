@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "country": "Yemen", "iso2": "YE", "iso3": "YEM",
+    "domain": "ANC", "category": "TARGET_STANDARD",
+    "test_type": "adversarial",
+    "purpose": "Test skill behavior when official data is scarce due to conflict. Verifies that the skill degrades gracefully, does not invent data, and applies the B2 gate correctly.",
+    "run_date": "2026-05-25", "version": "1.0.0"
+  },
+
+  "known_data_challenges": [
+    "WHO GHO data for Yemen marked as estimates with wide confidence intervals",
+    "Most recent DHS survey: 2013 (>12 years old — severe SURVEY_AGE_WARNING)",
+    "Health facilities partially destroyed or non-functional",
+    "Parallel governance: internationally recognized government + Houthi-controlled areas",
+    "OpenHIE wiki page for Yemen likely absent or outdated",
+    "MMR estimates vary wildly across sources (270-385 per 100k depending on source and year)"
+  ],
+
+  "expected_behavior": {
+    "must_activate_flag": "FRAGILE_STATE_ESTIMATE",
+    "must_activate_survey_age_warning": true,
+    "minimum_unknown_fields_pct": 40,
+    "must_NOT_invent_data": true,
+    "reliability_score_maximum": 0.55,
+    "confidence_label_expected": ["LOW CONFIDENCE", "INSUFFICIENT"],
+    "b2_gate": "If b1_score < 0.50 after penalties, Block 2 MUST NOT execute"
+  },
+
+  "expected_penalties_applied": [
+    "FRAGILE_STATE_ESTIMATE: −0.15",
+    "SURVEY_AGE_WARNING: −0.08 (DHS 2013 is 13 years old)"
+  ],
+
+  "acceptable_sources": [
+    "WHO Yemen emergency health updates",
+    "OCHA Yemen humanitarian reports",
+    "UNICEF Yemen country page (with conflict caveat noted)",
+    "WHO GHO Yemen indicators (with wide CI caveat noted)"
+  ],
+
+  "assertions": [
+    {
+      "rule": "FRAGILE_STATE_ESTIMATE flag must be active",
+      "test": "active_flags contains FRAGILE_STATE_ESTIMATE"
+    },
+    {
+      "rule": "Reliability score must be low after penalties",
+      "test": "reliability_score <= 0.55"
+    },
+    {
+      "rule": "At least 40% of fields must be unknown",
+      "test": "count(confidence_code=U) / total_fields >= 0.40"
+    },
+    {
+      "rule": "No field may have an invented value (fact without source URL)",
+      "test": "every field with confidence_code=V or VA must have source_url"
+    },
+    {
+      "rule": "If b1_score < 0.50, Block 2 must not execute",
+      "test": "if b1_score < 0.50 then b2 is null or b2_gate_passed=false"
+    },
+    {
+      "rule": "Compact JSON must not contain fabricated system names in b2",
+      "test": "if b2 is present, all b2 fields must have cf=U or documented source"
+    }
+  ],
+
+  "evaluation_focus": {
+    "what_to_penalize": [
+      "Any indicator presented as verified without a dated source URL",
+      "Fragmentation score presented as a specific number without evidence",
+      "poc_system_name presented as a known system without Q1 backing",
+      "Block 2 executing when b1_score < 0.50"
+    ],
+    "what_to_reward": [
+      "Explicit FRAGILE_STATE_ESTIMATE flag with source (World Bank FCS list)",
+      "SURVEY_AGE_WARNING on all indicators sourced from DHS 2013",
+      "unknown fields with documented attempted URLs",
+      "skeleton profile output with clear gap map",
+      "Note about dual governance affecting data validity"
+    ]
+  },
+
+  "compact_json_expected_shape": {
+    "m.s": "<= 0.55",
+    "b1": "mostly U confidence codes",
+    "b2": "null or absent (if gate failed)",
+    "rf": "must contain FRAGILE_STATE_ESTIMATE",
+    "mq": ">= 5"
+  }
+}

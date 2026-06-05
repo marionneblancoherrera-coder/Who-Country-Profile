@@ -1,0 +1,238 @@
+# retrieval_strategy.yml
+# WHO DAK Intelligence Platform — sources/retrieval_strategy.yml
+# Which sources to use per country profile, in what order.
+# References source IDs from source_catalog.yml.
+# Does NOT embed interpretation or heuristics — only retrieval sequences.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+# Profiles map to derived_operational_profiles in country_taxonomy.yml.
+# Each profile is a combination of structural dimensions, not a narrative label.
+# The classifier assigns a profile code; this file resolves the source sequence.
+
+profiles:
+
+  # ── PROFILE_DONOR_GLOBAL_GOODS (TS) ─────────────────────────
+  PROFILE_DONOR_GLOBAL_GOODS:
+    activated_by:
+      financing_model: donor_supported
+      digital_architecture: global_goods
+    description: "LMIC with active external health donors and WHO global goods in use"
+
+    b1_sequence:
+      - source: unicef_country
+        priority: high
+        extract_fields: [domain_indicators, maternal_health]
+      - source: world_bank_api
+        priority: high
+        extract_fields: [health_expenditure, physician_density, hospital_beds]
+      - source: global_fund_portfolio
+        priority: high
+        extract_fields: [active_grants, digital_health_investment]
+      - source: pepfar_country
+        priority: medium
+        extract_fields: [donor_presence]
+      - source: gavi_eligibility
+        priority: medium
+        extract_fields: [gavi_eligible]
+
+    b2_sequence:
+      - source: ohie_country_wiki
+        priority: high
+        extract_fields: [poc_system, hmis_platform, interoperability_architecture]
+        crosscheck_required: true
+      - source: global_fund_portfolio
+        priority: high
+        extract_fields: [digital_systems_funded, facility_coverage]
+      - source: digital_square_guidebook
+        priority: medium
+        extract_fields: [global_goods_active]
+      - source: dhis2_in_action
+        priority: medium
+        extract_fields: [dhis2_active, ministry_using]
+      - source: path_resources
+        priority: medium
+        extract_fields: [poc_maintainer, system_in_transition]
+      - source: pubmed_pmc
+        priority: high
+        query_intent: adoption_barriers
+      - source: pubmed_pmc
+        priority: high
+        query_intent: integration_gaps
+
+    crosscheck_after: [ohie_country_wiki, national_moh]
+    atlas_fallback: "WHO Digital Health Atlas is js_blocked — use ohie_country_wiki instead"
+
+  # ── PROFILE_SOVEREIGN_NATIONAL — CENTRALIZED variant (CE) ───
+  PROFILE_SOVEREIGN_NATIONAL_CE:
+    activated_by:
+      financing_model: sovereign
+      implementation_model: national_platform
+      governance_model: centralized
+      source_sovereignty_restriction: false
+    description: "Upper-middle income centralized national system — vendor often the government"
+
+    b1_sequence:
+      - source: paho_country
+        priority: high
+        extract_fields: [health_system_structure, ehr_mentions]
+        regions: [AMRO]
+      - source: idb_publications
+        priority: high
+        extract_fields: [national_ehr_details, digital_adoption]
+        regions: [AMRO]
+      - source: who_euro_observatory
+        priority: high
+        extract_fields: [health_system_structure, decentralization]
+        regions: [EURO]
+      - source: world_bank_api
+        priority: high
+        extract_fields: [health_expenditure, physician_density]
+      - source: unicef_country
+        priority: high
+        extract_fields: [domain_indicators]
+
+    b2_sequence:
+      - source: paho_country
+        priority: high
+        extract_fields: [digital_health_systems, integration_status]
+        regions: [AMRO]
+      - source: idb_publications
+        priority: high
+        extract_fields: [poc_details, coverage, adoption, maintainer]
+        regions: [AMRO]
+      - source: exemplars_health
+        priority: medium
+        extract_fields: [real_world_digital_use]
+      - source: national_moh
+        priority: medium
+        extract_fields: [official_system_name, coverage_claims]
+        crosscheck_required: true
+      - source: pubmed_pmc
+        priority: high
+        query_intent: adoption_barriers
+      - source: pubmed_pmc
+        priority: high
+        query_intent: official_silence
+
+    note: "National EHR frequently absent from WHO Digital Health Atlas. Use paho + idb as primary."
+
+  # ── PROFILE_SOVEREIGN_NATIONAL — SOVEREIGN variant (SV) ─────
+  PROFILE_SOVEREIGN_NATIONAL_SV:
+    activated_by:
+      financing_model: sovereign
+      source_sovereignty_restriction: true
+    description: "State-owned infrastructure with data sovereignty constraints"
+
+    b1_sequence:
+      - source: world_bank_api
+        priority: high
+        extract_fields: [health_expenditure, physician_density]
+      - source: unicef_country
+        priority: high
+        extract_fields: [domain_indicators]
+      - source: who_gho_api
+        priority: high
+        extract_fields: [domain_indicators]
+
+    b2_sequence:
+      - source: pubmed_pmc
+        priority: high
+        query_intent: national_digital_health_status
+        note: "Primary source — official portals have limited English content"
+      - source: who_gidh
+        priority: medium
+        extract_fields: [who_country_collaboration, gidh_partnership]
+      - source: national_moh
+        priority: low
+        extract_fields: [architecture_name, national_framework]
+        crosscheck_required: true
+      - source: pubmed_pmc
+        priority: high
+        query_intent: interoperability_gaps
+
+    localization_path: policy_alignment
+    feasibility_flag: true
+
+  # ── PROFILE_FEDERAL_FRAGMENTED — standard (FR) ───────────────
+  PROFILE_FEDERAL_FRAGMENTED:
+    activated_by:
+      governance_model: federal
+      implementation_model: regionalized
+      international_organisation_host: false
+    description: "High-income federal system with regional implementation autonomy"
+
+    b1_sequence:
+      - source: who_euro_observatory
+        priority: high
+        extract_fields: [system_structure, decentralization_level, expenditure]
+      - source: world_bank_api
+        priority: high
+        extract_fields: [health_expenditure, out_of_pocket]
+      - source: unicef_country
+        priority: high
+        extract_fields: [domain_indicators]
+      - source: ecdc_country
+        priority: medium
+        extract_fields: [disease_burden]
+
+    b2_sequence:
+      - source: who_euro_observatory
+        priority: high
+        extract_fields: [ehr_fragmentation, transition_status]
+      - source: national_ehealth_agency
+        priority: high
+        extract_fields: [nominal_coverage, adoption_rate, mandate_status]
+        crosscheck_required: true
+      - source: ecdc_country
+        priority: medium
+        extract_fields: [surveillance_systems]
+      - source: pubmed_pmc
+        priority: high
+        query_intent: regional_fragmentation
+      - source: pubmed_pmc
+        priority: high
+        query_intent: official_silence
+        note: "Surfaces interoperability failures absent from official portals"
+
+  # ── PROFILE_FEDERAL_FRAGMENTED — HQ variant ──────────────────
+  PROFILE_FEDERAL_FRAGMENTED_HQ:
+    activated_by:
+      governance_model: federal
+      international_organisation_host: true
+    description: "WHO/UN headquarters host — non-standard localization path"
+
+    b1_sequence:
+      - source: world_bank_api
+        priority: high
+        extract_fields: [health_expenditure, out_of_pocket]
+      - source: who_euro_observatory
+        priority: high
+        extract_fields: [system_structure, cantonal_balance]
+      - source: unicef_country
+        priority: medium
+        extract_fields: [domain_indicators]
+
+    b2_sequence:
+      - source: national_ehealth_agency
+        priority: high
+        extract_fields: [ehr_legal_status, roadmap, nominal_coverage]
+        crosscheck_required: true
+      - source: gdhi_project
+        priority: medium
+        extract_fields: [digital_maturity_score]
+      - source: pubmed_pmc
+        priority: high
+        query_intent: real_adoption
+        note: "Critical — official sources suppress real adoption figures"
+      - source: pubmed_pmc
+        priority: high
+        query_intent: regional_fragmentation
+      - source: grey_literature_search
+        priority: low
+        query_intent: real_adoption
+        note: "Use only if Q1 insufficient for real adoption data"
+
+    localization_path: strategy_alignment
+    feasibility_flag: true

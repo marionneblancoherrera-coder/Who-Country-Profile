@@ -1,0 +1,511 @@
+# domain_indicators.yml
+# WHO DAK Intelligence Platform — config/domain_indicators.yml
+# Indicator catalog for Block 1 retrieval.
+# domain_router.py reads this file.
+# ============================================================
+# schema_version : 1.0.0
+# last_reviewed  : 2026-05-25
+# api_bases:
+#   world_bank : https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100
+#   who_gho    : https://ghoapi.azureedge.net/api/{CODE}
+#   unicef     : https://data.unicef.org/country/{ISO2}/
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+# ============================================================
+# UNIVERSAL INDICATORS
+# Retrieved for every DAK domain and country.
+# ============================================================
+universal_indicators:
+
+  population:
+    code: "SP.POP.TOTL"
+    label: "Population, total"
+    source: global_normative
+    api: world_bank
+    profile_section: country_context
+    recency: current
+
+  life_expectancy:
+    code: "SP.DYN.LE00.IN"
+    label: "Life expectancy at birth (years)"
+    source: global_normative
+    api: world_bank
+    profile_section: population_health
+    recency: current
+
+  health_expenditure_per_capita:
+    code: "SH.XPD.CHEX.PC.CD"
+    label: "Current health expenditure per capita (USD)"
+    source: global_normative
+    api: world_bank
+    profile_section: health_financing
+    recency: current
+
+  out_of_pocket_pct:
+    code: "SH.XPD.OOPC.CH.ZS"
+    label: "Out-of-pocket expenditure (% current health expenditure)"
+    source: global_normative
+    api: world_bank
+    profile_section: health_financing
+    recency: current
+    dak_relevance: >
+      High OOP signals financial access barriers that affect
+      care-seeking behaviour regardless of DAK domain.
+
+  physician_density:
+    code: "SH.MED.PHYS.ZS"
+    label: "Physicians per 1,000 people"
+    source: global_normative
+    api: world_bank
+    profile_section: workforce_infrastructure
+    recency: recent
+    b2_signal: >
+      density < 0.2 per 1,000 → flag RISK_LOW_OPERATOR_CAPACITY.
+      Prefer low-complexity digital systems in B2.
+
+  hospital_beds:
+    code: "SH.MED.BEDS.ZS"
+    label: "Hospital beds per 1,000 people"
+    source: global_normative
+    api: world_bank
+    profile_section: workforce_infrastructure
+    recency: recent
+
+  basic_sanitation:
+    code: "SH.STA.BASS.ZS"
+    label: "Population using at least basic sanitation (%)"
+    source: global_normative
+    api: world_bank
+    profile_section: environmental_health
+    recency: current
+
+  basic_water:
+    code: "SH.H2O.BASW.ZS"
+    label: "Population using at least basic drinking water (%)"
+    source: global_normative
+    api: world_bank
+    profile_section: environmental_health
+    recency: current
+
+  uhc_index:
+    code: "SH.UHC.SRVS.CV.XD"
+    label: "UHC service coverage index (0–100)"
+    source: global_normative
+    api: world_bank
+    profile_section: healthcare_access
+    recency: current
+
+# ============================================================
+# DOMAIN INDICATOR SETS
+# Activated by domain_router.py based on dak_domain input.
+# ============================================================
+domain_indicator_sets:
+
+  # ──────────────────────────────
+  ANC:
+    domain_label: "Antenatal Care"
+    who_ig: "smart.who.int/anc-dak"
+    indicators:
+
+      anc4_coverage:
+        code: "RMNCH.ANC_4"
+        label: "ANC4+ coverage — at least 4 antenatal visits (%)"
+        source: global_normative
+        api: unicef
+        profile_section: healthcare_access
+        recency: current
+        note: >
+          Not available from UNICEF for high-income countries.
+          Use DHS Programme or national statistics for HQ_PARADOX
+          and FRAGMENTED profiles.
+        b2_signal: >
+          coverage < 50 → prioritise primary care and community
+          health worker systems in B2. De-prioritise hospital EMR.
+
+      anc1_coverage:
+        code: "RMNCH.ANC_1"
+        label: "ANC1 coverage — at least 1 antenatal visit (%)"
+        source: global_normative
+        api: unicef
+        profile_section: healthcare_access
+        recency: current
+
+      institutional_delivery:
+        code: "RMNCH.SAB"
+        label: "Births attended by skilled health personnel (%)"
+        source: global_normative
+        api: unicef
+        profile_section: healthcare_access
+        recency: current
+
+      maternal_mortality_ratio:
+        code: "MDG_0000000026"
+        label: "Maternal mortality ratio (per 100,000 live births)"
+        source: global_normative
+        api: who_gho
+        profile_section: population_health
+        recency: current
+        conflict_note: >
+          WHO GHO uses UN MMEIG modelled estimates.
+          DHS Programme uses survey-direct figures.
+          Values frequently diverge. Apply CONTRADICTED flag
+          when both are retrieved and differ. Do not resolve.
+
+      neonatal_mortality:
+        label: "Neonatal mortality rate (per 1,000 live births)"
+        source: global_normative
+        api: unicef
+        profile_section: population_health
+        recency: current
+
+      contraceptive_prevalence:
+        code: "REPROD_MET"
+        label: "Contraceptive prevalence — modern methods (%)"
+        source: global_normative
+        api: who_gho
+        profile_section: healthcare_access
+        recency: recent
+
+      caesarean_rate:
+        label: "Caesarean section rate (% of live births)"
+        source: global_normative
+        api: who_gho
+        profile_section: healthcare_access
+        recency: recent
+        note: "Proxy for medicalisation of birth. High rates signal different DAK implementation context."
+
+    infrastructure_focus:
+      facility_levels: [primary, secondary, maternity]
+      patient_pathway: >
+        ANC pathway: community outreach → primary health centre →
+        district/referral hospital for complications.
+        Map against national ANC protocol facility-level assignments.
+      installed_capacity_indicators:
+        - midwife_density
+        - maternity_beds
+        - emergency_obstetric_care_availability
+      equity_indicators:
+        - rural_urban_anc4_gap
+        - wealth_quintile_anc4_gap
+        - adolescent_birth_rate
+      dak_use_case_signal: >
+        If anc4_coverage > 85% AND quality_gap evidence found →
+        DAK use case = quality standardisation, not coverage expansion.
+        (Costa Rica lesson: 99% institutional delivery,
+        only 4/94 health areas with >80% quality ANC.)
+
+  # ──────────────────────────────
+  HIV:
+    domain_label: "HIV Prevention and Treatment"
+    who_ig: "smart.who.int/hiv"
+    indicators:
+
+      hiv_prevalence_adults:
+        code: "HIV_0000000001"
+        label: "HIV prevalence among adults 15–49 (%)"
+        source: global_normative
+        api: who_gho
+        alt_source: "unaids.org/en/regionscountries/{country}"
+        profile_section: population_health
+        recency: current
+
+      art_coverage:
+        code: "HIV_0000000026"
+        label: "ART coverage among people living with HIV (%)"
+        source: global_normative
+        api: who_gho
+        alt_source: unaids
+        profile_section: healthcare_access
+        recency: current
+
+      pmtct_coverage:
+        code: "HIV_0000000004"
+        label: "PMTCT — ART coverage among pregnant women with HIV (%)"
+        source: global_normative
+        api: unicef
+        profile_section: healthcare_access
+        recency: current
+
+      viral_load_suppression:
+        label: "Viral load suppression among people on ART (%)"
+        source: global_normative
+        alt_source: "unaids.org or PEPFAR country page"
+        profile_section: healthcare_access
+        recency: current
+        note: "PEPFAR DATIM data is more granular than UNAIDS for PEPFAR-active countries."
+
+      pepfar_active:
+        label: "PEPFAR programme active (boolean)"
+        source: global_normative
+        fetch_url: "pepfar.gov/countries/{country}/"
+        profile_section: financing
+        recency: current
+        b2_signal: >
+          pepfar_active = true → anticipate OpenMRS HIV module
+          or DATIM in B2 (see donor_signals.yml for confidence).
+
+    infrastructure_focus:
+      facility_levels: [primary, secondary, laboratory]
+      patient_pathway: >
+        HIV pathway: community testing → primary care ART initiation →
+        viral load monitoring at lab → treatment failure escalation.
+      installed_capacity_indicators:
+        - lab_capacity_viral_load
+        - point_of_care_testing_coverage
+      equity_indicators:
+        - key_population_coverage
+        - rural_art_access_gap
+
+  # ──────────────────────────────
+  TB:
+    domain_label: "Tuberculosis"
+    who_ig: "smart.who.int/tb"
+    indicators:
+
+      tb_incidence:
+        code: "TB_1"
+        label: "TB incidence rate (per 100,000 population)"
+        source: global_normative
+        api: who_gho
+        alt_source: "WHO Global TB Report (annual PDF)"
+        profile_section: population_health
+        recency: current
+
+      tb_treatment_success:
+        code: "TB_4"
+        label: "TB treatment success rate — new and relapse cases (%)"
+        source: global_normative
+        api: who_gho
+        profile_section: healthcare_access
+        recency: current
+
+      mdr_tb_pct:
+        code: "TB_e_rr_pct_new"
+        label: "Drug-resistant TB among new TB cases (%)"
+        source: global_normative
+        api: who_gho
+        profile_section: population_health
+        recency: current
+
+      tb_hiv_coinfection:
+        label: "TB/HIV co-infection rate (%)"
+        source: global_normative
+        alt_source: "WHO Global TB Report"
+        profile_section: population_health
+        recency: current
+
+      gf_tb_grant:
+        label: "Global Fund TB grant active (boolean)"
+        source: global_normative
+        fetch_url: "theglobalfund.org/en/portfolio/{country}/"
+        profile_section: financing
+        recency: current
+
+    infrastructure_focus:
+      facility_levels: [primary, secondary, laboratory, specialized]
+      patient_pathway: >
+        TB pathway: community case-finding → primary care diagnosis →
+        DOTS/treatment at primary or secondary → drug-susceptibility
+        testing at reference lab for MDR-TB.
+      installed_capacity_indicators:
+        - lab_capacity_culture_dst
+        - dots_coverage
+      equity_indicators:
+        - incarcerated_population_tb_rate
+        - mining_sector_exposure
+
+  # ──────────────────────────────
+  Immunization:
+    domain_label: "Immunization"
+    who_ig: "smart.who.int/immunization"
+    indicators:
+
+      dtp3_coverage:
+        code: "WHS4_100"
+        label: "DTP3 coverage among 1-year-olds (%)"
+        source: global_normative
+        api: who_gho
+        alt_source: unicef
+        profile_section: healthcare_access
+        recency: current
+
+      mcv1_coverage:
+        code: "WHS8_110"
+        label: "MCV1 coverage among 1-year-olds (%)"
+        source: global_normative
+        api: who_gho
+        profile_section: healthcare_access
+        recency: current
+
+      mcv2_coverage:
+        code: "MCV2"
+        label: "MCV2 coverage by nationally recommended age (%)"
+        source: global_normative
+        api: who_gho
+        profile_section: healthcare_access
+        recency: current
+
+      pcv3_coverage:
+        code: "PCV3"
+        label: "PCV3 coverage among 1-year-olds (%)"
+        source: global_normative
+        api: who_gho
+        profile_section: healthcare_access
+        recency: current
+        note: "May be absent for some countries — treat as optional."
+
+      zero_dose_children:
+        label: "Zero-dose children (DTP0) — estimated number"
+        source: global_normative
+        api: unicef
+        profile_section: equity
+        recency: current
+        dak_relevance: >
+          High zero-dose count signals equity gap in immunization reach.
+          DAK implementation should address the underlying access barrier.
+
+      gavi_eligible:
+        label: "GAVI eligibility status"
+        source: global_normative
+        fetch_url: "gavi.org/support/process/apply/eligibility/"
+        profile_section: financing
+        recency: current
+        b2_signal: >
+          gavi_eligible = true → anticipate cold chain digital systems
+          (OpenLMIS, DHIS2 Immunization tracker) in B2.
+
+    infrastructure_focus:
+      facility_levels: [community, primary, cold_chain_hub]
+      patient_pathway: >
+        Immunization pathway: birth dose at facility → primary series
+        at community/primary care → cold chain from national store →
+        district cold room → facility refrigerator.
+      installed_capacity_indicators:
+        - cold_chain_functional_coverage
+        - vaccine_stock_availability
+      equity_indicators:
+        - zero_dose_children_subnational
+        - dropout_rate_dtp1_dtp3
+
+# ============================================================
+# HEALTH SYSTEM INFRASTRUCTURE
+# Cross-cutting — retrieved for all domains.
+# Informs patient pathway and installed capacity profiling.
+# ============================================================
+health_system_infrastructure:
+
+  facility_level_taxonomy:
+    description: >
+      Standard WHO health system level classification.
+      Used to map DAK target facility type.
+    levels:
+      community:
+        label: "Community and outreach"
+        typical_cadre: "Community health workers, volunteers"
+        digital_suitability: "Low-complexity only (USSD, CommCare, ODK)"
+      primary:
+        label: "Primary health centre / dispensary"
+        typical_cadre: "Nurses, clinical officers, midwives"
+        digital_suitability: "Moderate (OpenMRS lite, DHIS2 tracker)"
+      secondary:
+        label: "District / general hospital"
+        typical_cadre: "Doctors, specialists"
+        digital_suitability: "Full EMR capable"
+      tertiary:
+        label: "Regional / national referral hospital"
+        typical_cadre: "Specialists, subspecialists"
+        digital_suitability: "Full EMR, lab integration"
+
+  referral_pathway_signals:
+    description: >
+      Indicators used to infer functional referral system capacity.
+      High maternal mortality ratio with high institutional delivery
+      rate signals referral quality failure — not access failure.
+    signal_combinations:
+      quality_gap: >
+        High institutional delivery (>85%) + High MMR (>100) →
+        DAK value = emergency obstetric care decision-support.
+      access_gap: >
+        Low institutional delivery (<60%) + High MMR →
+        DAK value = community-level ANC data capture.
+      coverage_complete: >
+        High ANC4+ (>85%) + Low MMR (<50) →
+        DAK value = quality standardisation across facilities.
+
+  equity_dimensions:
+    description: >
+      Equity-relevant disaggregations to request from sources.
+      Applied across all domains.
+    dimensions:
+      - urban_rural
+      - wealth_quintile
+      - geographic_region
+      - ethnicity_or_indigenous_status
+      - migrant_or_refugee_status
+      - disability_status
+    note: >
+      Equity data is rarely available from global normative sources alone.
+      National DHS, MICS, or programme monitoring datasets required.
+      Flag as unknown when disaggregated data is not retrievable.
+
+# ============================================================
+# B2 ROUTING SIGNALS SUMMARY
+# Consolidated signals from B1 that modify B2 behaviour.
+# priming_engine.py reads this section.
+# ============================================================
+b2_routing_signals:
+
+  low_coverage:
+    trigger: "domain_coverage_pct < 50"
+    instruction: >
+      Prioritise primary care and community health worker systems.
+      De-prioritise hospital EMR as DAK integration target.
+
+  quality_gap_detected:
+    trigger: "domain_coverage_pct > 85 AND quality_gap_evidence = true"
+    instruction: >
+      DAK use case is quality standardisation, not coverage expansion.
+      Look for decision-support and protocol compliance features in B2.
+
+  low_operator_capacity:
+    trigger: "physician_density < 0.2 OR nurse_midwife_density < 2.0"
+    instruction: >
+      Flag RISK_LOW_OPERATOR_CAPACITY.
+      Prefer low-complexity digital systems (USSD, CommCare, ODK).
+
+  donor_gf_active:
+    trigger: "gf_grant_active = true"
+    instruction: >
+      Anticipate DHIS2. Verify in B2.
+      See donor_signals.yml for confidence and caveats.
+
+  donor_pepfar_active:
+    trigger: "pepfar_active = true AND dak_domain = HIV"
+    instruction: "Anticipate OpenMRS HIV module or DATIM. Verify in B2."
+
+  donor_gavi_active:
+    trigger: "gavi_eligible = true AND dak_domain = Immunization"
+    instruction: "Anticipate cold chain systems, OpenLMIS, DHIS2 immunization tracker."
+
+  decentralised_system:
+    trigger: "governance_model = federal OR fragmentation_score > 5"
+    instruction: "Anticipate fragmentation_index > 3 in B2. Confirm."
+
+  guidelines_outdated:
+    trigger: "national_guidelines_year < current_year - 3"
+    instruction: >
+      Flag GUIDELINES_OUTDATED.
+      POC system may have outdated protocol logic embedded.
+      Step 2 of DAK localisation may require guidelines update first.
+
+# ============================================================
+# VERSIONING
+# ============================================================
+versioning:
+  indicators_version: "1.0.0"
+  change_policy:
+    major_version: "Domain added or removed"
+    minor_version: "New indicators or infrastructure dimensions"
+    patch_version: "Code correction, label update, note clarification"

@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "country": "Zambia", "iso2": "ZM", "iso3": "ZMB",
+    "domain": "ANC", "category": "TARGET_STANDARD",
+    "ground_truth_source": "Muliokela et al. (2022). Digital Health. PMC8814973",
+    "secondary_source": "Lee & Singini (2023). BMC Health Services Res. PMC10566315",
+    "run_date": "2026-05-25", "version": "1.0.0"
+  },
+
+  "expected_classification": {
+    "category_code": "TS",
+    "category_label": "Standard DAK Localization Target",
+    "localization_feasibility_flag": false
+  },
+
+  "expected_b1": {
+    "mmr_range": [213, 278],
+    "mmr_note": "WHO GHO model estimate 213; DHS Zambia 2021 survey 278. Both valid — different methodologies.",
+    "anc4_coverage_approx": 76,
+    "institutional_delivery_approx": 67,
+    "active_gf_grant": true,
+    "gavi_eligible": true,
+    "pepfar_active": false,
+    "national_guidelines_current": false
+  },
+
+  "expected_b2": {
+    "poc_system_name": "SmartCare",
+    "poc_system_type": "proprietary — co-developed MoH + US CDC",
+    "poc_maintainer_contains": ["Ministry of Health Zambia", "IHM Southern Africa"],
+    "hmis_platform": "DHIS2",
+    "hmis_facility_coverage_approx": 0.90,
+    "poc_hmis_integration": false,
+    "poc_hmis_integration_note": "Manual extraction required Western Province — Lee & Singini 2023",
+    "fragmentation_score_range": [3, 6],
+    "active_global_goods_contains": ["DHIS2", "Bahmni"],
+    "system_in_transition": false
+  },
+
+  "expected_risk_flags": {
+    "must_fire": ["RISK_INTEROPERABILITY_GAP", "GUIDELINES_OUTDATED"],
+    "should_fire": ["RISK_VENDOR_IS_GOVERNMENT", "RISK_LOW_OPERATOR_CAPACITY"],
+    "must_not_fire": ["RISK_TRANSITION", "LOCALIZATION_FEASIBILITY_FLAG"]
+  },
+
+  "critical_q1_finding": {
+    "description": "SmartCare-DHIS2 integration gap is documented ONLY in PMC — absent from all official MoH documents.",
+    "source": "Lee & Singini (2023). PMC10566315",
+    "evaluation_rule": "If poc_hmis_integration=False is sourced from Q1 (PMC), full marks A5. If sourced from official MoH only, penalty."
+  },
+
+  "expected_moh_question_themes": [
+    "SmartCare-DHIS2 integration gap resolution since 2023",
+    "IAF 2023 interoperability layer implementation status",
+    "MoH IT capacity for DAK integration 2026-2027",
+    "Zambia ANC national guidelines update timeline",
+    "Western Province SmartCare adoption and data quality"
+  ],
+
+  "assertions": [
+    {"field": "b2.poc_system_name", "contains": "SmartCare"},
+    {"field": "b2.hmis_platform", "contains": "DHIS2"},
+    {"field": "b2.poc_hmis_integration", "equals": false},
+    {"field": "b1.active_gf_grant", "equals": true},
+    {"field": "reliability_score", "minimum": 0.65},
+    {"field": "moh_questions", "minimum_count": 5},
+    {"field": "active_flags", "contains_any": ["RISK_INTEROPERABILITY_GAP"]}
+  ],
+
+  "expected_compact_json_keys": ["m", "b1", "b2", "rf", "mq"],
+  "expected_json_max_tokens": 300
+}

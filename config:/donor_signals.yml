@@ -1,0 +1,267 @@
+# donor_signals.yml
+# WHO DAK Intelligence Platform — config/donor_signals.yml
+# Probabilistic donor-to-digital-system correlations.
+# priming_engine.py and evidence_classifier.py read this file.
+#
+# IMPORTANT: These are operational heuristics, not structural facts.
+# Evidence type for every entry: operational_heuristic
+# Confidence reflects historical correlation, not certainty.
+# Verify all signals in Block 2 — do not treat as verified.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+evidence_type: operational_heuristic
+heuristics_version: "1.0"
+
+principles:
+  - heuristics_are_probabilistic_not_deterministic
+  - country_context_may_override_any_signal
+  - always_verify_in_block2_retrieval
+  - donor_exit_or_transition_may_invalidate_signal
+  - version_and_date_every_update
+
+# ============================================================
+# DONOR PROFILES
+# ============================================================
+donors:
+
+  global_fund:
+    label: "The Global Fund to Fight AIDS, Tuberculosis and Malaria"
+    portfolio_url: "theglobalfund.org/en/portfolio/{country}/"
+    active_domains: [HIV, TB, Malaria]
+    retrieval_field: "active_gf_grant"
+
+    digital_system_signals:
+      - system: DHIS2
+        confidence: 0.82
+        basis: >
+          Global Fund standard reporting requirements reference DHIS2
+          as the primary HMIS platform in the majority of active grants.
+          GF Data Quality Review 2024.
+        caveats:
+          - "May not apply if country is mid-migration to alternative HMIS"
+          - "Confidence lower for grants < 3 years active"
+          - "Some countries use custom reporting tools alongside DHIS2"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+      - system: OpenLMIS
+        confidence: 0.55
+        basis: >
+          Global Fund supply chain investments frequently co-fund
+          OpenLMIS deployment for health commodity management.
+        caveats:
+          - "Less consistent than DHIS2 — verify explicitly in B2"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+    b2_instruction: >
+      Anticipate DHIS2 as primary HMIS. Search OpenHIE wiki and
+      DHIS2 in-action for confirmation. Note grant domain (HIV/TB/Malaria)
+      as context for which modules are most likely active.
+
+  pepfar:
+    label: "US President's Emergency Plan for AIDS Relief"
+    portfolio_url: "pepfar.gov/countries/{country}/"
+    active_domains: [HIV]
+    retrieval_field: "pepfar_active"
+
+    digital_system_signals:
+      - system: OpenMRS
+        confidence: 0.68
+        basis: >
+          PEPFAR DATIM ecosystem has historically driven OpenMRS
+          HIV module deployment across sub-Saharan Africa.
+          PEPFAR DATIM 2023 implementation survey.
+        caveats:
+          - "KenyaEMR, SmartCare, and other national systems also present"
+          - "Confidence varies significantly by country and implementing partner"
+          - "PEPFAR is transitioning some reporting to DATIM-direct in recent cycles"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+      - system: DATIM
+        confidence: 0.88
+        basis: >
+          DATIM (PEPFAR's data management system) is a near-universal
+          requirement for PEPFAR programme reporting.
+        caveats:
+          - "DATIM is a reporting system, not a point-of-care EMR"
+          - "Does not imply clinical decision-support capability"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+    b2_instruction: >
+      For HIV domain: anticipate OpenMRS HIV module or national
+      HIV EMR. Always check for DATIM as parallel reporting layer.
+      Note: DATIM ≠ clinical EMR — check POC system separately.
+
+  gavi:
+    label: "Gavi, the Vaccine Alliance"
+    portfolio_url: "gavi.org/support/process/apply/eligibility/"
+    active_domains: [Immunization]
+    retrieval_field: "gavi_eligible"
+
+    digital_system_signals:
+      - system: DHIS2_immunization_tracker
+        confidence: 0.70
+        basis: >
+          Gavi co-invests in immunization information systems.
+          DHIS2 immunization tracker is the dominant platform
+          in Gavi-eligible countries with active digital health grants.
+        caveats:
+          - "Eligibility ≠ active programme — verify grant status"
+          - "Some countries use eJRF and alternative registry tools"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+      - system: OpenLMIS
+        confidence: 0.62
+        basis: >
+          Gavi cold chain investments frequently include supply
+          chain digital tools. OpenLMIS is the primary open-source option.
+        caveats:
+          - "Country may use proprietary cold chain management tools"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+    b2_instruction: >
+      For Immunization domain: anticipate DHIS2 immunization tracker
+      and cold chain management system. Check gavi.org for active
+      digital health grant specifically (eligibility alone is insufficient).
+
+  world_bank:
+    label: "World Bank Group (PforR, DPL, investment operations)"
+    active_domains: [all]
+    retrieval_field: "world_bank_active"
+
+    digital_system_signals:
+      - system: "national_proprietary_EHR"
+        confidence: 0.60
+        basis: >
+          World Bank PforR and investment operations in middle-income
+          countries frequently co-fund development of national proprietary
+          health information systems rather than global goods.
+          Costa Rica EDUS (PforR 2016) is a confirmed example.
+        caveats:
+          - "Highly country-specific — no universal pattern"
+          - "Low-income country operations may instead fund DHIS2"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+    b2_instruction: >
+      World Bank signal is weaker than GF/PEPFAR/GAVI for predicting
+      specific systems. Look for the specific operation name and scope
+      in the portfolio page. Costa Rica EDUS = confirmed WB PforR output.
+
+  eu_pnrr:
+    label: "European Union — PNRR and Structural Funds (health digitisation)"
+    active_domains: [all]
+    retrieval_field: "eu_pnrr_active"
+    applicable_profiles: [FRAGMENTED]
+
+    digital_system_signals:
+      - system: "national_EHR_modernisation"
+        confidence: 0.75
+        basis: >
+          EU PNRR health digitalisation investments are funding
+          national EHR upgrades and interoperability layers in
+          EU member states. Italy FSE 2.0 is a confirmed example.
+        caveats:
+          - "Applies to EU member states only"
+          - "Transition is active — integration target may shift"
+          - "FHIR R4 adoption is part of FSE 2.0 mandate (Italy)"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+    b2_instruction: >
+      For EU FRAGMENTED countries: check PNRR national recovery plan
+      for health digitisation component. Active PNRR investment means
+      system_in_transition is likely. DAK integration target may be
+      the new FHIR layer, not the current legacy system.
+
+  giz:
+    label: "Deutsche Gesellschaft für Internationale Zusammenarbeit (GIZ)"
+    active_domains: [all]
+    retrieval_field: "giz_active"
+
+    digital_system_signals:
+      - system: DHIS2
+        confidence: 0.55
+        basis: >
+          GIZ digital health programmes in sub-Saharan Africa and
+          Southeast Asia have contributed to DHIS2 implementations
+          in several countries.
+        caveats:
+          - "Less consistent signal than GF/PEPFAR"
+          - "GIZ may fund capacity building rather than system deployment"
+        version: "1.0"
+        last_reviewed: "2026-05-25"
+
+    b2_instruction: >
+      GIZ active is a weak signal. Retrieve GIZ country programme
+      page for specific digital health scope before making predictions.
+
+# ============================================================
+# ABSENCE OF DONORS
+# ============================================================
+donor_absence_signals:
+
+  no_external_donors:
+    condition: >
+      All of gf_grant_active, pepfar_active, gavi_eligible,
+      world_bank_active are false or absent.
+    interpretation: >
+      Country finances its own digital health infrastructure.
+      No global goods predicted from donor signals.
+      System type determined entirely by B2 retrieval.
+    applicable_profiles: [SOVEREIGN, HQ_PARADOX, CENTRALIZED]
+    b2_instruction: >
+      No donor-based system predictions available.
+      Rely entirely on category_catalog.yml source retrieval
+      and B2 evidence to identify active systems.
+
+# ============================================================
+# SYSTEM REFERENCE (verified global goods)
+# Minimal reference — full catalog in sources/category_catalog.yml
+# ============================================================
+known_global_goods:
+  DHIS2:
+    type: HMIS
+    maintainer: "University of Oslo / HISP Network"
+    url: "dhis2.org"
+    dak_integration_path: "standard — DHIS2 has documented DAK/FHIR integration pathway"
+  OpenMRS:
+    type: EMR
+    maintainer: "OpenMRS Community"
+    url: "openmrs.org"
+    dak_integration_path: "standard — OpenMRS HIV module well-documented"
+  Bahmni:
+    type: EMR
+    maintainer: "Bahmni Coalition / IHM Southern Africa"
+    url: "bahmni.org"
+    dak_integration_path: "standard — Zambia confirmed example"
+  OpenLMIS:
+    type: LMIS
+    maintainer: "OpenLMIS Community"
+    url: "openlmis.org"
+    dak_integration_path: "supply chain layer — separate from clinical DAK integration"
+  CommCare:
+    type: CHW_platform
+    maintainer: "Dimagi"
+    url: "dimagi.com/commcare"
+    dak_integration_path: "community health worker layer"
+
+# ============================================================
+# VERSIONING
+# ============================================================
+versioning:
+  signals_version: "1.0.0"
+  change_policy:
+    major_version: "New donor added or donor removed"
+    minor_version: "Confidence update with new evidence or new system signal"
+    patch_version: "Caveat clarification or wording update"
+  update_trigger: >
+    Update confidence scores when new systematic evidence
+    is available (e.g. global implementation surveys, GF reviews).
+    Document the new evidence source in the basis field.

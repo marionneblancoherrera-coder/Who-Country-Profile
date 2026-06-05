@@ -1,0 +1,117 @@
+# query_templates.yml
+# WHO DAK Intelligence Platform — sources/query_templates.yml
+# Maps retrieval intents to parameterized query strings.
+# Separates WHAT to find from HOW to query for it.
+# Change query strings here without touching retrieval_strategy.yml.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+# Parameters available in all templates:
+#   {COUNTRY_NAME}  — properly cased country name
+#   {DOMAIN}        — DAK domain (ANC, HIV, TB, Immunization)
+#   {EHR_NAME}      — discovered EHR name (EDUS, EPD, FSE, etc.)
+#   {YEARS}         — lookback window in years (default: 3)
+
+intents:
+
+  adoption_barriers:
+    description: "Find evidence of low real-world adoption or barriers to system use"
+    rationale: "Official sources report mandates and nominal coverage — not whether systems are actually used"
+    crosscheck_purpose: "Surfaces what government portals suppress"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "electronic health record" AND ("adoption" OR "barriers" OR "uptake" OR "use") AND ("low" OR "limited" OR "challenge")'
+      years: 3
+      max_results: 3
+    web_search:
+      template: '"{COUNTRY_NAME}" {EHR_NAME} adoption rate OR usage statistics {YEAR}'
+      source_type: grey_literature
+
+  integration_gaps:
+    description: "Find evidence of missing or broken inter-system data flows"
+    rationale: "POC-to-HMIS integration gaps are systematically absent from official documentation"
+    crosscheck_purpose: "Documents what MoH portals omit about interoperability"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "health information system" AND ("integration" OR "interoperability" OR "data exchange") AND ("gap" OR "missing" OR "manual" OR "fragmented")'
+      years: 3
+      max_results: 2
+
+  official_silence:
+    description: "Find evidence of implementation failures absent from official sources"
+    rationale: "Two-source check — official portal gives success narrative; this query finds the failure narrative"
+    crosscheck_purpose: "Core to the official silence policy in evidence_rules.yml"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "health data" AND ("implementation" OR "failure" OR "challenges" OR "problems")'
+      years: 2
+      max_results: 2
+
+  regional_fragmentation:
+    description: "Find evidence of regional variation in digital health implementation"
+    rationale: "National EHR frameworks may have uniform mandates but uneven regional implementation"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "electronic health record" AND ("regional" OR "fragmentation" OR "variation" OR "subnational")'
+      years: 3
+      max_results: 2
+
+  real_adoption:
+    description: "Find actual usage figures distinct from nominal or mandated coverage"
+    rationale: "Legal mandate ≠ real adoption. Switzerland EPD: 1.3% adoption despite 2017 mandate."
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND ("{EHR_NAME}" OR "electronic health record" OR "EPR") AND ("adoption" OR "uptake" OR "registration" OR "active users")'
+      years: 3
+      max_results: 3
+    web_search:
+      template: '"{COUNTRY_NAME}" {EHR_NAME} Nutzung OR adoption OR users {YEAR}'
+      source_type: grey_literature
+
+  system_transition:
+    description: "Find evidence of active platform migration or system replacement"
+    rationale: "Integrating DAK into a system being replaced wastes effort"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND ("digital health" OR "EMR" OR "health information system") AND ("migration" OR "transition" OR "replacement" OR "new system")'
+      years: 2
+      max_results: 2
+
+  national_digital_health_status:
+    description: "Find overview of national digital health architecture — used for SOVEREIGN countries"
+    rationale: "Official English-language sources are limited for SOVEREIGN countries — PMC is primary"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND ("health informatization" OR "electronic health record" OR "health information system") AND ("implementation" OR "status" OR "progress" OR "challenge")'
+      years: 3
+      max_results: 3
+
+  interoperability_gaps:
+    description: "Find fragmentation between health systems within a country"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "health information" AND ("fragmentation" OR "silo" OR "island" OR "incompatible" OR "interoperability")'
+      years: 3
+      max_results: 2
+
+  domain_coverage_quality:
+    description: "Find evidence of quality gaps behind high nominal coverage figures"
+    rationale: "Costa Rica: 99% institutional delivery but only 4/94 areas meet quality threshold"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "{DOMAIN}" AND ("quality" OR "coverage" OR "trend" OR "barriers" OR "inequity")'
+      years: 3
+      max_results: 2
+
+  guidelines_currency:
+    description: "Find evidence about national clinical guideline status and recency"
+    pubmed:
+      template: '"{COUNTRY_NAME}" AND "{DOMAIN}" AND ("national guidelines" OR "clinical protocol" OR "standard of care") AND ("update" OR "revision" OR "outdated")'
+      years: 3
+      max_results: 2
+
+# ── Execution rules ───────────────────────────────────────────
+execution_rules:
+  mandatory_after_national_government: [adoption_barriers, official_silence]
+  mandatory_for_b2: [adoption_barriers, integration_gaps]
+  optional_when_evidence_needed: [real_adoption, system_transition, regional_fragmentation]
+  max_pubmed_results_per_intent: 3
+  preferred_journals:
+    - "JMIR Medical Informatics"
+    - "Lancet Digital Health"
+    - "Lancet Regional Health"
+    - "Digital Health"
+    - "BMC Health Services Research"
+    - "Health Policy and Systems"

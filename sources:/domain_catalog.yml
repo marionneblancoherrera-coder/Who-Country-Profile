@@ -1,0 +1,181 @@
+# domain_catalog.yml
+# WHO DAK Intelligence Platform — sources/domain_catalog.yml
+# DAK domain metadata: WHO IGs, facility levels, patient pathways,
+# equity dimensions, and DAK use case signals per domain.
+# domain_router.py reads this alongside domain_indicators.yml.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+domains:
+
+  ANC:
+    label: "Antenatal Care"
+    who_ig: "smart.who.int/anc-dak"
+    who_ig_version: "1.0.1"
+    facility_levels: [community, primary, secondary]
+    target_cadre: [midwife, nurse, clinical_officer]
+
+    patient_pathway:
+      entry: "Community outreach or self-referral"
+      primary_care: "ANC visits, blood pressure, weight, lab tests, counselling"
+      referral_trigger: "Complications (hypertension, bleeding, malpresentation)"
+      delivery: "Primary or secondary facility depending on risk"
+      postnatal: "48-hour check, family planning"
+
+    installed_capacity_indicators:
+      - midwife_density_per_10k
+      - maternity_beds_per_1k
+      - emergency_obstetric_care_availability
+      - antenatal_ultrasound_access
+
+    equity_dimensions:
+      - rural_urban_anc4_gap
+      - wealth_quintile_anc4_gap
+      - adolescent_birth_rate
+      - migrant_refugee_access
+
+    dak_use_case_signals:
+      quality_standardization:
+        trigger: "anc4_coverage > 85 AND quality_gap_evidence = true"
+        example: "Costa Rica: 99% institutional delivery, 4/94 areas at quality threshold"
+      coverage_expansion:
+        trigger: "anc4_coverage < 60"
+        example: "Sub-Saharan Africa rural: low ANC4+ despite high unmet need"
+      equity_targeting:
+        trigger: "rural_urban_gap > 20 OR wealth_quintile_gap > 25"
+        example: "China: national 98% masks significant rural deficit"
+
+    key_dak_components:
+      - blood_pressure_monitoring
+      - gestational_age_assessment
+      - iron_folic_acid_supplementation
+      - hiv_testing_in_pregnancy
+      - syphilis_screening
+      - tetanus_vaccination
+      - birth_planning_counselling
+
+  HIV:
+    label: "HIV Prevention and Treatment"
+    who_ig: "smart.who.int/hiv"
+    who_ig_version: "2.0"
+    facility_levels: [community, primary, secondary, laboratory]
+    target_cadre: [nurse, clinical_officer, doctor, lab_technician, community_health_worker]
+
+    patient_pathway:
+      entry: "Community-based HIV testing or PITC at primary care"
+      linkage: "Same-day ART initiation where possible"
+      monitoring: "Viral load testing at 6 months, then annually"
+      treatment_failure: "Enhanced adherence support → regimen switch"
+      pmtct: "Parallel pathway for pregnant women — ART + infant prophylaxis"
+
+    installed_capacity_indicators:
+      - lab_capacity_viral_load_testing
+      - point_of_care_cd4_availability
+      - eid_turnaround_time
+
+    equity_dimensions:
+      - key_population_coverage
+      - rural_art_access_gap
+      - gender_testing_gap
+      - age_adolescent_linkage
+
+    dak_use_case_signals:
+      cascade_optimization:
+        trigger: "art_coverage > 70 AND vls_rate < 80"
+        example: "Countries with good linkage but poor retention or viral suppression"
+      testing_expansion:
+        trigger: "hiv_testing_coverage < 60"
+      pmtct_focus:
+        trigger: "dak_domain = HIV AND maternal context identified"
+
+    key_dak_components:
+      - hiv_testing_algorithms
+      - art_initiation_criteria
+      - viral_load_monitoring_schedule
+      - pmtct_regimen_selection
+      - oi_prophylaxis
+      - adherence_counselling
+
+  TB:
+    label: "Tuberculosis"
+    who_ig: "smart.who.int/tb"
+    who_ig_version: "1.0"
+    facility_levels: [primary, secondary, laboratory, specialized]
+    target_cadre: [nurse, clinical_officer, doctor, lab_technician]
+
+    patient_pathway:
+      entry: "Community case-finding or symptom-triggered presentation"
+      diagnosis: "Sputum smear → GeneXpert at primary or secondary"
+      treatment_initiation: "DOTS at primary care level"
+      dr_tb_pathway: "Drug susceptibility testing → reference lab → MDR regimen"
+      contact_tracing: "Household contacts, especially children under 5"
+
+    installed_capacity_indicators:
+      - lab_capacity_genexpert_density
+      - lab_capacity_culture_dst
+      - dots_coverage_pct
+
+    equity_dimensions:
+      - incarcerated_population_tb_rate
+      - mining_occupational_exposure
+      - homeless_hard_to_reach
+      - indigenous_community_burden
+
+    dak_use_case_signals:
+      mdr_tb_focus:
+        trigger: "mdr_tb_pct > 5"
+      contact_investigation:
+        trigger: "tb_incidence > 300 AND contact_tracing_coverage < 50"
+      comorbidity_integration:
+        trigger: "tb_hiv_coinfection > 20"
+
+    key_dak_components:
+      - tb_screening_algorithms
+      - diagnostic_cascade
+      - treatment_regimen_selection
+      - dots_adherence_support
+      - dr_tb_management
+      - tb_hiv_co_management
+
+  Immunization:
+    label: "Immunization"
+    who_ig: "smart.who.int/immunization"
+    who_ig_version: "1.0"
+    facility_levels: [community, primary, cold_chain_hub, district_store]
+    target_cadre: [nurse, community_health_worker, cold_chain_technician]
+
+    patient_pathway:
+      birth: "Birth dose (BCG, HepB) at delivery facility"
+      primary_series: "6, 10, 14 weeks at primary care or outreach"
+      boosters: "9–18 months depending on national schedule"
+      cold_chain: "National store → district cold room → health facility refrigerator → outreach"
+      missed_doses: "Default tracking → recall → catch-up"
+
+    installed_capacity_indicators:
+      - cold_chain_functional_coverage_pct
+      - vaccine_stock_availability_days
+      - outreach_session_frequency
+
+    equity_dimensions:
+      - zero_dose_children_subnational
+      - dropout_rate_dtp1_to_dtp3
+      - hard_to_reach_population_coverage
+      - nomadic_population_coverage
+
+    dak_use_case_signals:
+      zero_dose_elimination:
+        trigger: "zero_dose_children_count > 100000"
+        example: "Large LMIC with significant unvaccinated populations"
+      dropout_reduction:
+        trigger: "dropout_rate_dtp1_dtp3 > 10"
+      registry_readiness:
+        trigger: "immunization_registry_absent = true"
+
+    key_dak_components:
+      - vaccination_schedule_logic
+      - contraindication_screening
+      - cold_chain_temperature_monitoring
+      - adverse_event_reporting
+      - coverage_reporting
+      - reminder_recall_logic

@@ -1,0 +1,709 @@
+# ============================================================
+# country_taxonomy.yml
+# WHO DAK Intelligence Platform — config/country_taxonomy.yml
+# ============================================================
+#
+# Purpose:
+#   Structural classification system for national and subnational
+#   health-system implementation environments.
+#
+#   This file describes durable system characteristics only.
+#   Operational heuristics, retrieval rules, risk-generation logic,
+#   and source registries are intentionally kept in separate files:
+#     - config/donor_signals.yml
+#     - config/risk_definitions.yml
+#     - config/source_hierarchy.yml
+#     - config/evidence_rules.yml
+#     - sources/category_catalog.yml
+#
+#   The taxonomy is descriptive, not normative.
+#   It does not classify countries as "advanced", "compliant",
+#   or "ready". It describes structural system traits.
+#
+#   Dynamic operational signals (low adoption, active migration)
+#   are separated from structural dimensions. They are observed
+#   states, not permanent labels.
+#
+# ============================================================
+#
+# schema_version  : 2.0.0
+# last_reviewed   : 2026-05-25
+# maintainer      : WHO DAK Intelligence — NLP Project USI 2026
+# empirical_basis : 5-country live execution (May 2026)
+#                   Zambia · Costa Rica · Italy · China · Switzerland
+#
+# ============================================================
+
+schema_version: "2.0.0"
+last_reviewed: "2026-05-25"
+maintainer: "WHO DAK Intelligence — NLP Project USI 2026"
+
+classification_scope:
+  supported_levels:
+    - national
+    - subnational
+    - programmatic
+    - implementation_specific
+
+principles:
+  - descriptive_over_normative
+  - structure_over_narrative
+  - reproducibility_over_case_interpretation
+  - modular_dimensions_over_single_category
+  - operational_intelligence_separated_from_taxonomy
+  - evidence_traceability_required
+  - dynamic_signals_must_not_override_structural_classification
+
+# ============================================================
+# STRUCTURAL DIMENSIONS
+# Countries are described across six independent dimensions.
+# No single dimension is sufficient for full characterisation.
+# ============================================================
+
+structural_dimensions:
+
+  governance_model:
+    description: >
+      How authority for health-system governance, implementation,
+      procurement, and digital health operations is distributed.
+    allowed_values:
+      centralized:
+        definition: >
+          National authority controls most implementation,
+          procurement, standards, and deployment decisions.
+        examples_from_runs: ["Costa Rica (CCSS)", "China (NHC/State Council)"]
+      federal:
+        definition: >
+          Subnational entities maintain substantial autonomy
+          over implementation and operational decisions.
+        examples_from_runs: ["Switzerland (26 cantons)", "Italy (20 regions)"]
+      hybrid:
+        definition: >
+          National strategy exists but implementation authority
+          is partially decentralised.
+        examples_from_runs: ["Zambia (MoH national + district health offices)"]
+
+  financing_model:
+    description: >
+      Dominant financing patterns for digital health and
+      health-system modernisation.
+    allowed_values:
+      donor_supported:
+        definition: >
+          External financing substantially contributes to digital
+          health infrastructure or ongoing implementation.
+        operational_note: >
+          See donor_signals.yml for donor-to-system correlations.
+          These are probabilistic heuristics, not structural facts.
+        examples_from_runs: ["Zambia (Global Fund + GAVI)"]
+      sovereign:
+        definition: >
+          Primarily nationally financed. External donors absent
+          or marginal for digital health.
+        examples_from_runs: ["Switzerland", "Italy", "China", "Costa Rica (World Bank PforR)"]
+      mixed:
+        definition: >
+          Combination of sovereign and external financing.
+        examples_from_runs: []
+
+  implementation_model:
+    description: >
+      How digital systems are operationalised across the
+      health system.
+    allowed_values:
+      national_platform:
+        definition: >
+          Nationally coordinated implementation architecture
+          with a single primary platform or integration layer.
+        examples_from_runs: ["Costa Rica (EDUS/CCSS)", "China (4631-2 framework)"]
+      regionalized:
+        definition: >
+          Multiple regional implementations with varying
+          governance or technical autonomy.
+        examples_from_runs: ["Italy (20 FSE implementations)", "Switzerland (26 cantonal EPDs)"]
+      facility_driven:
+        definition: >
+          Implementations emerge at facility or programme level
+          with limited national coordination.
+        examples_from_runs: ["Zambia (SmartCare + Bahmni deployment pattern)"]
+
+  digital_architecture:
+    description: >
+      Dominant technical ecosystem characteristics.
+    allowed_values:
+      global_goods:
+        definition: >
+          Open-source or internationally shared digital health
+          platforms (OpenMRS, DHIS2, Bahmni, OpenLMIS) dominate.
+        operational_note: >
+          Presence of global goods enables standard DAK technical
+          integration. See sources/category_catalog.yml for
+          discovery sources by architecture type.
+        examples_from_runs: ["Zambia (DHIS2 + Bahmni/OpenMRS + OpenLMIS)"]
+      proprietary:
+        definition: >
+          Vendor-controlled or nationally proprietary systems dominate.
+          May include in-house government-built platforms.
+        examples_from_runs:
+          - "Costa Rica (EDUS — built by CCSS)"
+          - "Switzerland (EPD — Swisscom / Swiss Post)"
+          - "China (4631-2 — state-owned)"
+      hybrid:
+        definition: >
+          Combination of proprietary and global-good ecosystems.
+          Common in countries with vertical disease programmes
+          alongside national proprietary systems.
+        examples_from_runs: ["Italy (proprietary FSE + open standards push FSE 2.0)"]
+
+  interoperability_state:
+    description: >
+      Current interoperability maturity across the health
+      information system.
+    allowed_values:
+      unified:
+        definition: >
+          Core interoperability standards and exchange mechanisms
+          are broadly operational at national scale.
+        examples_from_runs: []
+      fragmented:
+        definition: >
+          Multiple disconnected systems or inconsistent exchange
+          standards coexist. May include high nominal coverage
+          with low real interoperability.
+        examples_from_runs:
+          - "Italy (97.8% FSE nominal coverage, inter-regional exchange largely absent)"
+          - "Switzerland (EPD systems incompatible between providers)"
+          - "China (information islands — 40+ systems in Beijing hospitals)"
+      transitional:
+        definition: >
+          Major interoperability reforms, migrations, or
+          standardisation programmes are actively underway.
+        examples_from_runs:
+          - "Zambia (IAF 2023 integration programme)"
+          - "Italy (FSE 2.0 / FHIR transition, Phase II 2024-2026)"
+          - "Switzerland (EPD → E-GD / SwissHDS under DigiSanté 2025-2034)"
+
+  operational_maturity:
+    description: >
+      Observed implementation maturity across the health system.
+      Distinct from digital_architecture — a system may be
+      architecturally advanced but operationally immature.
+    allowed_values:
+      emerging:
+        definition: >
+          Early-stage implementation or low operational coverage.
+          May include systems that exist on paper but lack
+          field adoption.
+        examples_from_runs:
+          - "Switzerland EPD adoption dimension (1.3% real, June 2025)"
+      scaling:
+        definition: >
+          Rapid implementation growth with uneven adoption
+          across facility types or geographic areas.
+        examples_from_runs: ["Zambia (DHIS2 90% facilities, SmartCare ~60%)"]
+      mature:
+        definition: >
+          Stable operational use across large portions of the
+          system, though quality or interoperability gaps may persist.
+        examples_from_runs:
+          - "Costa Rica EDUS (97%+ population coverage, widely used)"
+          - "Italy FSE (nominal maturity, interoperability immature)"
+
+  international_organisation_host:
+    description: >
+      Country hosts a WHO headquarters, regional office, or
+      major UN organisation with digital health mandate.
+      This is a structural fact, not an evaluative label.
+      It is operationally relevant because the country's own
+      health digital system may not reflect the organisation's
+      technical standards.
+    allowed_values:
+      yes:
+        examples:
+          - "Switzerland — WHO HQ, Geneva (Avenue Appia 20)"
+          - "USA — UN New York, WHO PAHO Washington"
+          - "Kenya — WHO AFRO, UN Nairobi"
+          - "Denmark — WHO EURO Copenhagen"
+          - "Belgium — WHO EURO Brussels (regional)"
+      no:
+        definition: "Country does not host a major UN/WHO headquarters"
+
+# ============================================================
+# DYNAMIC SIGNALS
+# Temporary observations that must not define structural
+# classification. They expire as conditions change.
+# ============================================================
+
+dynamic_signals:
+
+  active_transition:
+    definition: >
+      Major digital-health platform migration, replacement,
+      or interoperability transition is ongoing.
+    examples_from_runs:
+      - "Italy: FSE → FSE 2.0 (Phase II, PNRR funded, target 2026)"
+      - "Switzerland: EPD → DigiSanté / SwissHDS (2025-2034)"
+      - "Zambia: IAF 2023 adding interoperability layer"
+    evidence_requirement: >
+      Must be supported by a dated Tier 1 or Tier 2 source.
+      Mark as resolved when transition is complete.
+
+  donor_dependency:
+    definition: >
+      Critical operational components depend on external financing.
+      Flag if loss of donor funding would interrupt core operations.
+    examples_from_runs: ["Zambia: DHIS2 + Bahmni funded by Global Fund"]
+    evidence_requirement: "Recent Global Fund, USAID, or GAVI portfolio documentation."
+
+  interoperability_gap:
+    definition: >
+      Observed interoperability falls substantially below
+      nominal or officially reported levels.
+    examples_from_runs:
+      - "Costa Rica: EDUS (CCSS) and SIVEI (MoH) not connected — PAHO Tier 1"
+      - "Zambia: SmartCare–DHIS2 manual extraction — Lee & Singini 2023, PMC"
+    evidence_requirement: >
+      Must be supported by Tier 1 or Tier 2 source.
+      Official sources frequently do NOT document this signal.
+      Mandatory PMC Q1 query after every official source retrieval.
+
+  low_real_world_adoption:
+    definition: >
+      Observed operational uptake substantially below nominal
+      or legally mandated coverage.
+    examples_from_runs:
+      - "Switzerland: EPD 1.3% adoption (June 2025) vs legal mandate since 2022"
+    evidence_requirement: >
+      Official sources systematically omit this signal.
+      Tier 2 (PMC) or Tier 5 (specialist news) required.
+      Record source tier and date retrieved.
+
+  vendor_fragmentation:
+    definition: >
+      Multiple competing vendors or incompatible implementations
+      operate simultaneously within the same national system.
+    examples_from_runs:
+      - "Switzerland: Swisscom EPD and Swiss Post EPD are incompatible"
+
+  governance_fragmentation:
+    definition: >
+      Governance authority is distributed in ways that complicate
+      unified implementation mandates.
+    examples_from_runs:
+      - "Italy: 20 regional authorities with FSE implementation autonomy"
+      - "Switzerland: 26 cantons with EPD implementation autonomy; Uri formally withdrew (2025)"
+
+  source_sovereignty_restriction:
+    definition: >
+      National data sovereignty laws or policies restrict
+      cross-border health data flows or external system integration.
+    examples_from_runs:
+      - "China: Data Security Law (2021), partial relaxation 2024"
+    evidence_requirement: "Dated legal or regulatory source."
+
+# ============================================================
+# FRAGMENTATION INDEX
+# Formalised for reproducibility.
+# Produces a 0–10 score from five weighted sub-dimensions.
+# ============================================================
+
+fragmentation_index:
+  description: >
+    Composite measure of structural fragmentation in the
+    national digital health system. Weighted across five
+    independently assessable sub-dimensions.
+  scale: "0.0–10.0"
+  version: "1.0"
+
+  sub_dimensions:
+    parallel_ehr_ecosystems:
+      weight: 0.30
+      definition: >
+        Number of distinct, non-interoperable EHR or health
+        information systems in simultaneous national use.
+      scoring_guide:
+        "0":  "Single unified national system"
+        "3":  "2–3 parallel systems (common in LMIC dual-track)"
+        "5":  "4–7 parallel systems"
+        "7":  "8–15 parallel systems"
+        "10": "16+ parallel systems or extreme fragmentation"
+      examples_from_runs:
+        "Costa Rica": "0.0 (EDUS single national)"
+        "Zambia": "3.0 (SmartCare + Bahmni + DHIS2)"
+        "Italy": "10.0 (20 FSE regional systems)"
+        "Switzerland": "9.0 (26 cantonal + 2 incompatible private providers)"
+        "China": "8.0 (4631-2 framework with 31 provincial implementations)"
+
+    interoperability_absence:
+      weight: 0.25
+      definition: >
+        Degree to which systems lack real-world data exchange
+        despite nominal interoperability policies or mandates.
+      scoring_guide:
+        "0":  "Unified real-time exchange operational"
+        "5":  "Partial or manual exchange documented"
+        "10": "Exchange absent despite mandate; systems siloed"
+      examples_from_runs:
+        "Costa Rica": "7.0 (EDUS–SIVEI gap, PAHO confirmed)"
+        "Zambia": "6.0 (SmartCare–DHIS2 manual extraction, PMC confirmed)"
+        "Italy": "8.0 (inter-regional FSE exchange largely absent)"
+
+    regional_governance_autonomy:
+      weight: 0.20
+      definition: >
+        Degree to which subnational units can independently
+        determine implementation, procurement, or standards.
+      scoring_guide:
+        "0":  "Full national mandate enforceable"
+        "5":  "Shared authority — national strategy, regional implementation"
+        "10": "Full regional autonomy; national mandate unenforceable"
+      examples_from_runs:
+        "Costa Rica": "0.0 (CCSS centralises all authority)"
+        "China": "4.0 (national framework mandated, provincial adaptation)"
+        "Italy": "8.0 (20 regions with implementation autonomy)"
+        "Switzerland": "9.0 (26 cantons; one formally abandoned EPD)"
+
+    vendor_diversity:
+      weight: 0.15
+      definition: >
+        Number and incompatibility of vendors or platform
+        providers in the same system layer.
+      scoring_guide:
+        "0":  "Single vendor or fully interoperable multi-vendor"
+        "5":  "2–3 vendors with partial interoperability"
+        "10": "High vendor diversity with incompatible systems"
+      examples_from_runs:
+        "Switzerland": "9.0 (Swisscom + Swiss Post EPDs incompatible)"
+        "Zambia": "5.0 (SmartCare/MoH + IHM Southern Africa/Bahmni)"
+
+    standards_inconsistency:
+      weight: 0.10
+      definition: >
+        Degree of inconsistency in health data standards,
+        coding systems, or terminology across the ecosystem.
+      scoring_guide:
+        "0":  "National standards uniformly applied"
+        "5":  "Mixed standards with active harmonisation efforts"
+        "10": "No operative national standard; each system independent"
+
+  calculation: >
+    fragmentation_score =
+      (parallel_ehr_ecosystems   * 0.30) +
+      (interoperability_absence  * 0.25) +
+      (regional_governance_autonomy * 0.20) +
+      (vendor_diversity           * 0.15) +
+      (standards_inconsistency    * 0.10)
+
+  interpretation:
+    low:
+      range: "0.0–3.0"
+      label: "Low fragmentation"
+      operational_note: >
+        Single or well-integrated system. DAK integration target
+        is clear. Governance risk is manageable.
+    moderate:
+      range: "3.1–6.0"
+      label: "Moderate fragmentation"
+      operational_note: >
+        Multiple systems with partial integration. Integration
+        target requires stakeholder alignment. Interoperability
+        gap risk active.
+    high:
+      range: "6.1–8.5"
+      label: "High fragmentation"
+      operational_note: >
+        Significant parallel ecosystems. DAK integration requires
+        explicit governance decision about target system.
+    critical:
+      range: "8.6–10.0"
+      label: "Critical fragmentation"
+      operational_note: >
+        Uniform DAK integration technically infeasible without
+        national governance intervention or waiting for active
+        transition to complete.
+
+# ============================================================
+# REFERENCE EXAMPLES (multi-dimensional profiles)
+# These are illustrative, not definitive ground truth.
+# Dimension scores reflect the May 2026 live execution.
+# ============================================================
+
+reference_examples:
+
+  Switzerland:
+    governance_model: federal
+    financing_model: sovereign
+    implementation_model: regionalized
+    digital_architecture: proprietary
+    interoperability_state: fragmented
+    operational_maturity: mature
+    international_organisation_host: yes
+    fragmentation_score_approx: 8.9
+    run_date: "2026-05-08"
+    reliability_score: 0.80
+    observed_dynamic_signals:
+      - governance_fragmentation
+      - vendor_fragmentation
+      - active_transition
+      - low_real_world_adoption
+    key_empirical_finding: >
+      EPD 1.3% real adoption (June 2025) vs legal mandate since 2017.
+      First canton (Uri) formally withdrew from EPD (2025).
+      Swisscom/Swiss Post EPDs incompatible.
+      DigiSanté 2025-2034 programme launched replacing eHealth Strategy.
+    source_ground_truth:
+      - "Swiss Medical Weekly (2025), PMC Tier 2"
+      - "The Broker News (June 2025), Tier 5"
+      - "e-health-suisse.ch, Tier 3"
+
+  Zambia:
+    governance_model: hybrid
+    financing_model: donor_supported
+    implementation_model: facility_driven
+    digital_architecture: global_goods
+    interoperability_state: transitional
+    operational_maturity: scaling
+    international_organisation_host: no
+    fragmentation_score_approx: 4.7
+    run_date: "2026-05 (design analysis)"
+    reliability_score: 0.74
+    observed_dynamic_signals:
+      - donor_dependency
+      - active_transition
+      - interoperability_gap
+    key_empirical_finding: >
+      SmartCare–DHIS2 integration gap documented only in academic
+      literature (Lee & Singini 2023, PMC10566315), absent from
+      all official MoH documents. WHO Digital Health Atlas
+      JavaScript-blocked. IAF 2023 addresses integration.
+    source_ground_truth:
+      - "Muliokela et al. (2022). Digital Health. PMC8814973 — Tier 2"
+      - "Lee & Singini (2023). BMC Health Services Res. PMC10566315 — Tier 2"
+      - "Global Fund Zambia portfolio (2024) — Tier 1"
+
+  Costa_Rica:
+    governance_model: centralized
+    financing_model: sovereign
+    implementation_model: national_platform
+    digital_architecture: proprietary
+    interoperability_state: fragmented
+    operational_maturity: mature
+    international_organisation_host: no
+    fragmentation_score_approx: 2.4
+    run_date: "2026-05-08"
+    reliability_score: 0.77
+    observed_dynamic_signals:
+      - interoperability_gap
+      - active_transition
+    key_empirical_finding: >
+      EDUS (CCSS) absent from WHO Digital Health Atlas and Digital Square.
+      EDUS and SIVEI (MoH) institutionally separate; no automatic
+      data exchange for ANC indicators (PAHO Tier 1).
+      Only 4 of 94 health areas achieve >80% quality ANC coverage.
+      Primary ANC guideline dates from 2009.
+    source_ground_truth:
+      - "Ochoa Chaves et al. (2023). IDB Technical Note — Tier 1"
+      - "PMC11056608 (Soto-Ugalde 2024, BMC) — Tier 2"
+      - "PAHO Costa Rica country profile — Tier 1"
+      - "Estrategia Nacional Salud Digital CR 2023-2030 — Tier 3"
+
+  Italy:
+    governance_model: federal
+    financing_model: sovereign
+    implementation_model: regionalized
+    digital_architecture: hybrid
+    interoperability_state: fragmented
+    operational_maturity: mature
+    international_organisation_host: no
+    fragmentation_score_approx: 7.6
+    run_date: "2026-05-08"
+    reliability_score: 0.77
+    observed_dynamic_signals:
+      - governance_fragmentation
+      - interoperability_gap
+      - active_transition
+    key_empirical_finding: >
+      Two Lancet Regional Health papers (same month, 2025) contradict:
+      one calls FSE "fundamentally broken" (interoperability dimension);
+      one calls Italy "EU-27 fast tracker" (adoption dimension).
+      Both Tier 2. Both correct — measuring different dimensions.
+      FSE 2.0 Phase II active (Dec 2024 decree). PNRR funded.
+    source_ground_truth:
+      - "Lancet Regional Health-Europe, 2025 (broken claim) — Tier 2"
+      - "PMC11927704 (fast tracker claim), 2025 — Tier 2"
+      - "fascicolosanitario.gov.it (Nov 2023 statistics) — Tier 3"
+      - "PNRR FSE 2.0 decree, Dec 2024 — Tier 1"
+
+  China:
+    governance_model: centralized
+    financing_model: sovereign
+    implementation_model: national_platform
+    digital_architecture: proprietary
+    interoperability_state: fragmented
+    operational_maturity: scaling
+    international_organisation_host: no
+    fragmentation_score_approx: 7.2
+    run_date: "2026-05-08"
+    reliability_score: 0.77
+    observed_dynamic_signals:
+      - source_sovereignty_restriction
+      - active_transition
+      - interoperability_gap
+    key_empirical_finding: >
+      4631-2 national framework (4 tiers, 6 applications, 3 databases,
+      12 ministries). "Information islands" documented — 500+ hospitals
+      in Beijing use 40+ different IT systems. Data sovereignty law (DSL
+      2021, partial relaxation 2024). No global goods in use.
+      Best English sources: Chinese academic papers in PMC.
+    source_ground_truth:
+      - "Wu et al. (2024). Health Care Science. PMC11520242 — Tier 2"
+      - "Commonwealth Fund Country Profile China (2025) — Tier 1"
+      - "China CDC Weekly (2026) — Tier 2"
+
+# ============================================================
+# DERIVED OPERATIONAL PROFILES
+# Maps dimension combinations to operational profiles
+# used by classifier.py. This is the bridge between the
+# scientific taxonomy and the operational retrieval layer.
+# Profiles are derived, not hardcoded. The taxonomy is primary.
+# ============================================================
+
+derived_operational_profiles:
+
+  description: >
+    Classifier.py reads structural dimensions from reference_examples
+    and applies these mapping rules to derive an operational profile.
+    Profiles are used ONLY to select retrieval sources and
+    risk flag sets. They do not override structural classification.
+
+  mapping_rules:
+
+    PROFILE_DONOR_GLOBAL_GOODS:
+      trigger:
+        financing_model: donor_supported
+        digital_architecture: global_goods
+      operational_meaning: >
+        Standard DAK localization path applies.
+        Sources: OpenHIE, Global Fund, Digital Square, DHIS2.
+      matched_example: "Zambia"
+      prior_code: "TS"
+
+    PROFILE_SOVEREIGN_NATIONAL:
+      trigger:
+        financing_model: sovereign
+        implementation_model: national_platform
+        digital_architecture: proprietary
+        governance_model: centralized
+      operational_meaning: >
+        Vendor is likely the government itself.
+        Sources: PAHO/IDB (PAHO region) or WHO GIDH + PMC (other).
+      matched_examples: ["Costa Rica", "China"]
+      prior_code: "CE or SV — differentiated by international_organisation_host and data_sovereignty"
+      differentiation_rule: >
+        If source_sovereignty_restriction signal is present OR
+        no global health donor is active → route to SOVEREIGN sources.
+        Otherwise → route to CENTRALIZED sources.
+
+    PROFILE_FEDERAL_FRAGMENTED:
+      trigger:
+        governance_model: federal
+        implementation_model: regionalized
+        fragmentation_score: "> 5.0"
+      operational_meaning: >
+        Multiple regional implementations. Governance barrier likely.
+        Sources: WHO EURO / ECDC / EU Health Observatory.
+      matched_examples: ["Italy", "Switzerland"]
+      prior_code: "FR or HQ — differentiated by international_organisation_host"
+      differentiation_rule: >
+        If international_organisation_host = yes →
+          Generate LOCALIZATION_FEASIBILITY note.
+          WHO collaboration pathway may supersede technical integration.
+        If international_organisation_host = no →
+          Standard FRAGMENTED retrieval and risk assessment.
+
+# ============================================================
+# OPERATIONAL INTELLIGENCE LINKAGES
+# Referenced externally, not embedded.
+# ============================================================
+
+operational_linkages:
+
+  retrieval_policy:
+    file: "sources/category_catalog.yml"
+    description: >
+      Defines retrieval sequences, fallback chains,
+      and source prioritisation per operational profile.
+
+  risk_flag_registry:
+    file: "config/risk_definitions.yml"
+    description: >
+      Defines operational risk-generation rules and
+      activation conditions.
+
+  donor_pattern_registry:
+    file: "config/donor_signals.yml"
+    description: >
+      Defines observed donor-to-digital-system correlations.
+      These are probabilistic heuristics with confidence scores,
+      not structural facts.
+
+  source_hierarchy:
+    file: "config/source_hierarchy.yml"
+    description: >
+      Five-tier source quality classification with
+      confidence defaults and retrieval rules.
+
+  evidence_rules:
+    file: "config/evidence_rules.yml"
+    description: >
+      Defines fact vs inference vs operational_heuristic
+      vs contradicted classification logic.
+
+# ============================================================
+# EVIDENCE GOVERNANCE
+# ============================================================
+
+evidence_governance:
+
+  requirements:
+    - structural_classification_requires_sources
+    - dynamic_signals_require_recent_dated_evidence
+    - contradictions_must_be_recorded_not_resolved
+    - unresolved_states_must_be_preserved
+    - fragmentation_scores_must_cite_sub_dimension_evidence
+
+  prohibited_patterns:
+    - unsupported_editorial_claims
+    - geopolitical_or_value_judgments
+    - hardcoded_country_assumptions_without_evidence
+    - permanent_labels_derived_from_temporary_events
+    - resolving_source_contradictions_by_choosing_one_source
+
+  contradiction_handling: >
+    When two Tier 1 or Tier 2 sources disagree on the same
+    dimension or indicator, both must be recorded with their
+    sources, dates, and the dimension they each address.
+    The taxonomy and any derived profile must reflect the
+    contradiction — not suppress it.
+    Example: Italy FSE "broken" vs "fast tracker" — both correct
+    because they measure different sub-dimensions of the same system.
+
+# ============================================================
+# VERSIONING
+# ============================================================
+
+versioning:
+  taxonomy_version: "2.0.0"
+  fragmentation_model_version: "1.0"
+  evidence_model_version: "1.0"
+
+  change_policy:
+    major_version:
+      trigger: "Structural taxonomy redesign — dimensions added or removed"
+      requires: "Review by WHO Digital Health Architecture team"
+    minor_version:
+      trigger: "New dimension values, examples, or operational profiles added"
+      requires: "Evidence from at least one empirical run"
+    patch_version:
+      trigger: "Definition clarification, typo correction, score update"
+      requires: "Dated source for any factual change"
