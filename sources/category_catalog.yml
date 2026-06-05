@@ -1,0 +1,279 @@
+# category_catalog.yml
+# WHO DAK Intelligence Platform — sources/category_catalog.yml
+# URL sequences per country category for Block 2 retrieval.
+# retrieval_engine.py reads this. No URLs hardcoded in scripts.
+# ============================================================
+schema_version: "1.0.0"
+last_reviewed: "2026-05-25"
+
+# ── TARGET_STANDARD (TS) ─────────────────────────────────────
+TARGET_STANDARD:
+  b1_sources:
+    - id: ts_b1_unicef
+      url: "https://data.unicef.org/country/{ISO2}/"
+      source_type: global_normative
+      extract: [domain_indicators, maternal_health, immunization]
+    - id: ts_b1_worldbank
+      url: "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100"
+      source_type: global_normative
+      extract: [health_expenditure, physician_density, beds]
+    - id: ts_b1_globalfund
+      url: "https://www.theglobalfund.org/en/portfolio/{COUNTRY_SLUG}/"
+      source_type: global_normative
+      extract: [active_grants, digital_health_mentions, facility_coverage]
+    - id: ts_b1_pepfar
+      url: "https://www.pepfar.gov/countries/{COUNTRY_SLUG}/"
+      source_type: global_normative
+      extract: [pepfar_active, program_investment]
+    - id: ts_b1_gavi
+      url: "https://www.gavi.org/support/process/apply/eligibility/"
+      source_type: global_normative
+      extract: [gavi_eligible]
+
+  b2_sources:
+    - id: ts_b2_ohie
+      url: "https://wiki.ohie.org/display/CP/{COUNTRY_NAME}"
+      source_type: implementation_documentation
+      extract: [poc_system, hmis, interoperability_architecture]
+      note: "Check last-edited date. If > 18 months → confidence = inferred-weak"
+    - id: ts_b2_globalfund
+      url: "https://www.theglobalfund.org/en/portfolio/{COUNTRY_SLUG}/"
+      source_type: global_normative
+      extract: [digital_systems_funded, facility_coverage]
+    - id: ts_b2_digitalsquare
+      url: "https://digitalsquare.org/global-goods-guidebook"
+      source_type: implementation_documentation
+      extract: [active_global_goods]
+      format: pdf
+    - id: ts_b2_dhis2
+      url: "https://dhis2.org/in-action/"
+      source_type: implementation_documentation
+      extract: [dhis2_active, ministry, version]
+    - id: ts_b2_path
+      url: "https://www.path.org/resources/?q={COUNTRY_NAME}+digital+health"
+      source_type: programme_and_operational_reviews
+      extract: [poc_maintainer, system_in_transition]
+    - id: ts_b2_q1_barriers
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "electronic health record" AND ("adoption" OR "barriers" OR "low uptake")'
+      years: 3
+      max_results: 2
+    - id: ts_b2_q1_integration
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "health information system" AND ("integration" OR "fragmentation")'
+      years: 3
+      max_results: 2
+
+  who_atlas_rule: "js_blocked — do NOT conclude no digital systems. Use ohie + globalfund instead."
+  key_lesson: "Zambia: SmartCare-DHIS2 gap is in PMC only, absent from all official MoH documents."
+
+# ── CENTRALIZED (CE) ─────────────────────────────────────────
+CENTRALIZED:
+  b1_sources:
+    - id: ce_b1_paho
+      url: "https://www.paho.org/en/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [health_system_structure, ehr_mentions, digital_initiatives]
+    - id: ce_b1_idb
+      url: "https://publications.iadb.org/en/search#q={COUNTRY_NAME}+digital+health"
+      source_type: global_normative
+      extract: [national_system_name, coverage, adoption]
+    - id: ce_b1_worldbank
+      url: "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100"
+      source_type: global_normative
+      extract: [health_expenditure, physician_density]
+    - id: ce_b1_unicef
+      url: "https://data.unicef.org/country/{ISO2}/"
+      source_type: global_normative
+      extract: [domain_indicators]
+
+  b2_sources:
+    - id: ce_b2_paho
+      url: "https://www.paho.org/en/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [digital_health_systems, ehr_name, integration_status]
+    - id: ce_b2_idb
+      url: "https://publications.iadb.org/en/search#q={COUNTRY_NAME}+expediente+digital"
+      source_type: global_normative
+      extract: [edus_details, coverage, adoption, maintainer]
+    - id: ce_b2_exemplars
+      url: "https://www.exemplars.health/search?q={COUNTRY_NAME}"
+      source_type: programme_and_operational_reviews
+      extract: [real_world_digital_use, system_performance]
+    - id: ce_b2_moh
+      url_pattern: "Ministry of Health official website — discover via web search"
+      source_type: national_government
+      extract: [official_system_name, coverage_claims]
+      bias_warning: "Tier 3 — reports successes only. MANDATORY Q1 cross-check after."
+    - id: ce_b2_q1_adoption
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "health information system" AND ("barriers" OR "adoption" OR "interoperability")'
+      years: 3
+      max_results: 2
+    - id: ce_b2_q1_silence
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "electronic health" AND ("broken" OR "failure" OR "gap")'
+      years: 2
+      max_results: 2
+
+  key_lesson: "Costa Rica: EDUS (97% coverage) absent from WHO Digital Health Atlas. Use IDB + PAHO."
+  interop_warning: "EDUS (CCSS) and SIVEI (MoH) frequently NOT connected. Check explicitly."
+
+# ── FRAGMENTED (FR) ──────────────────────────────────────────
+FRAGMENTED:
+  b1_sources:
+    - id: fr_b1_euro_obs
+      url: "https://eurohealthobservatory.who.int/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [system_structure, decentralization_level, expenditure]
+    - id: fr_b1_worldbank
+      url: "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100"
+      source_type: global_normative
+      extract: [health_expenditure, out_of_pocket]
+    - id: fr_b1_unicef
+      url: "https://data.unicef.org/country/{ISO2}/"
+      source_type: global_normative
+      extract: [domain_indicators]
+
+  b2_sources:
+    - id: fr_b2_euro_obs
+      url: "https://eurohealthobservatory.who.int/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [ehr_fragmentation, national_vs_regional, transition_status]
+    - id: fr_b2_national_ehr
+      url_pattern: "National EHR portal — discover via web search"
+      examples:
+        Italy: "https://www.fascicolosanitario.gov.it/portale/en/"
+        Germany: "https://www.gematik.de/anwendungen/e-patientenakte"
+        France: "https://www.monespacesante.fr"
+        Spain: "https://www.mscbs.gob.es/ciudadanos/hclinica"
+      source_type: national_government
+      extract: [nominal_coverage, gp_adoption, regional_map]
+      bias_warning: "Tier 3 — reports successes. Run both Q1 queries after."
+    - id: fr_b2_ecdc
+      url: "https://www.ecdc.europa.eu/en/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [surveillance_systems, data_connection]
+    - id: fr_b2_q1_fragmentation
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "electronic health record" AND ("fragmentation" OR "interoperability" OR "regional")'
+      years: 3
+      max_results: 2
+    - id: fr_b2_q1_failure
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "health data" AND ("broken" OR "failure" OR "adoption gap")'
+      years: 2
+      max_results: 2
+      note: "This second query surfaces what official sources suppress. Italy lesson."
+
+  key_lesson: "Italy: two Lancet papers same month contradict. Run BOTH Q1 queries."
+  pnrr_signal: "If EU member + PNRR active → system likely transitioning to FHIR layer. DAK target may be the new layer."
+
+# ── SOVEREIGN (SV) ───────────────────────────────────────────
+SOVEREIGN:
+  b1_sources:
+    - id: sv_b1_who
+      url: "https://www.who.int/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [system_overview, who_collaboration]
+    - id: sv_b1_worldbank
+      url: "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100"
+      source_type: global_normative
+      extract: [health_expenditure, physician_density]
+    - id: sv_b1_unicef
+      url: "https://data.unicef.org/country/{ISO2}/"
+      source_type: global_normative
+      extract: [domain_indicators]
+
+  b2_sources:
+    - id: sv_b2_pmc_primary
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND ("health informatization" OR "electronic health record") AND ("implementation" OR "challenge" OR "status")'
+      years: 3
+      max_results: 3
+      note: "PRIMARY source for SOVEREIGN — official portals are limited in English"
+    - id: sv_b2_who_gidh
+      url: "https://www.who.int/publications/m/item/global-initiative-on-digital-health"
+      source_type: global_normative
+      extract: [who_country_collaboration, gidh_partnership]
+    - id: sv_b2_national_framework
+      type: web_search
+      query: '"{COUNTRY_NAME}" national health information system framework site:gov OR site:nhc'
+      source_type: national_government
+      extract: [architecture_name, levels, databases]
+    - id: sv_b2_q1_interop
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "health information" AND ("fragmentation" OR "island" OR "barrier")'
+      years: 3
+      max_results: 2
+
+  key_lesson: "China: 4631-2 framework absent from WHO registries. Best sources = Chinese academic PMC papers."
+  localization_path: "Policy alignment — not technical integration. Entry: national health commission."
+
+# ── HQ_PARADOX (HQ) ──────────────────────────────────────────
+HQ_PARADOX:
+  b1_sources:
+    - id: hq_b1_who
+      url: "https://www.who.int/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [health_profile]
+    - id: hq_b1_euro_obs
+      url: "https://eurohealthobservatory.who.int/countries/{COUNTRY_SLUG}"
+      source_type: global_normative
+      extract: [system_structure, cantonal_federal_balance]
+    - id: hq_b1_worldbank
+      url: "https://api.worldbank.org/v2/country/{ISO3}/indicator/{CODE}?format=json&per_page=100"
+      source_type: global_normative
+      extract: [health_expenditure, out_of_pocket]
+
+  b2_sources:
+    - id: hq_b2_ehealth_agency
+      url_pattern: "National eHealth agency — discover via web search"
+      examples:
+        Switzerland: "https://www.e-health-suisse.ch/en"
+        Denmark: "https://sundhedsdatastyrelsen.dk/en"
+        Norway: "https://www.ehelse.no/en"
+      source_type: national_government
+      extract: [ehr_current_status, transition_plan, fhir_roadmap]
+      bias_warning: "CRITICAL: official sites suppress real adoption data. MANDATORY PMC + Tier 5 after."
+    - id: hq_b2_gdhi
+      url: "https://www.gdhi-project.org/countries/{COUNTRY_NAME}"
+      source_type: programme_and_operational_reviews
+      extract: [maturity_score, dimension_breakdown]
+    - id: hq_b2_q1_adoption
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND ("EPD" OR "EPR" OR "electronic health record") AND ("adoption" OR "barriers" OR "low uptake")'
+      years: 3
+      max_results: 3
+      note: "CRITICAL: Switzerland EPD 1.3% real adoption found ONLY here — not on e-health-suisse.ch"
+    - id: hq_b2_tier5_adoption
+      type: web_search
+      query: '"{COUNTRY_NAME}" EPD Nutzung OR "{EHR_NAME}" adoption {YEAR}'
+      source_type: grey_literature
+      confidence: inferred-weak
+      note: "Last resort only. Always cite the primary data source the article references."
+    - id: hq_b2_q1_fragmentation
+      type: pubmed
+      query: '"{COUNTRY_NAME}" AND "digital health" AND ("cantonal" OR "federal" OR "fragmentation")'
+      years: 3
+      max_results: 2
+
+  key_lesson: "Switzerland: EPD 1.3% real adoption (June 2025) absent from e-health-suisse.ch. PMC + SRF found it."
+  localization_path: "Align DAK content with national digital health strategy. Entry: national eHealth agency + MoH."
+
+# ── UNIVERSAL fallback ────────────────────────────────────────
+# Used for MIXED category or when primary sources fail
+MIXED:
+  note: "Apply all category source sequences. Document ambiguity in output."
+  fallback_b1: [ts_b1_unicef, ts_b1_worldbank]
+  fallback_b2: [ts_b2_q1_barriers, ts_b2_q1_integration]
+
+# ── URL template variables ────────────────────────────────────
+url_variables:
+  COUNTRY_SLUG: "lowercase hyphenated country name (e.g. costa-rica, zambia)"
+  COUNTRY_NAME: "properly cased country name for search queries"
+  ISO2: "2-letter ISO code (e.g. CR, ZM, CH)"
+  ISO3: "3-letter ISO code (e.g. CRI, ZMB, CHE)"
+  CODE: "World Bank or WHO GHO indicator code from domain_indicators.yml"
+  YEAR: "current year (2026)"
+  EHR_NAME: "national EHR name discovered in b2 (e.g. EPD, EDUS, FSE)"
