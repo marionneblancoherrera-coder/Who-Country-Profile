@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "country": "Costa Rica",
+    "dak_domain": "ANC",
+    "category": "CENTRALIZED",
+    "ground_truth_source": "Ochoa Chaves et al. (2023). IDB Technical Note. doi:10.18235/0005019",
+    "secondary_sources": [
+      "PMC11056608 (Soto-Ugalde 2024, BMC)",
+      "PAHO Costa Rica interoperability gap documentation",
+      "World Bank PforR 2024 (Costa Rica CCSS EDUS)",
+      "Estrategia Nacional de Salud Digital Costa Rica 2023-2030"
+    ],
+    "live_execution_date": "2026-05-08",
+    "live_execution_combined_score": 0.77,
+    "created": "2026-05-08",
+    "version": "0.1.0"
+  },
+  "expected_block1": {
+    "health_system_structure": "centralized under CCSS (Beveridge-Bismarck hybrid)",
+    "active_gf_grant": false,
+    "pepfar_active": false,
+    "gavi_eligible": false,
+    "active_donors": ["World Bank (PforR 2016-active)"],
+    "maternal_mortality_ratio_range": [22, 24],
+    "maternal_mortality_ratio_note": "22 per 100k (WHO/UNICEF 2020); 24 (WHO 2023). Different years.",
+    "institutional_delivery_pct": 99,
+    "national_guidelines_current": false,
+    "guidelines_year": 2009,
+    "quality_coverage_gap": true,
+    "quality_coverage_gap_note": "Only 4 of 94 health areas achieve >80% quality prenatal care (NDHS 2023-2030)"
+  },
+  "expected_block2": {
+    "poc_system_name": "EDUS (Expediente Digital Único en Salud)",
+    "poc_system_type": "proprietary — in-house CCSS development",
+    "poc_maintainer": "CCSS (client + developer + operator)",
+    "hmis_platform": "SIVEI (under Ministry of Health, separate from CCSS)",
+    "poc_hmis_integration": false,
+    "poc_hmis_integration_note": "EDUS (CCSS) and SIVEI (Ministry of Health) not automatically connected. Documented in PAHO Tier 1 source.",
+    "fragmentation_index": 1,
+    "system_in_transition": "partial",
+    "system_in_transition_detail": "SNOMED CT integration active; IAFA expansion Phase 2 Sept 2025",
+    "active_global_goods": [],
+    "dak_target_system_contains": "EDUS",
+    "dak_target_system_requires": "MoH/CCSS technical agreement"
+  },
+  "expected_risk_flags_active": [
+    "RISK_VENDOR_IS_GOVERNMENT",
+    "RISK_INTEROPERABILITY_GAP"
+  ],
+  "expected_risk_flags_inactive": [
+    "RISK_ADOPTION_GAP",
+    "RISK_FRAGMENTATION"
+  ],
+  "new_flags_generated": [
+    "QUALITY_COVERAGE_GAP"
+  ],
+  "key_insights": [
+    "EDUS not in any WHO registry — found via IDB case study",
+    "EDUS-SIVEI gap documented in PAHO Tier 1, not in CCSS website",
+    "Quality gap (4/94 areas) redefines DAK use case from coverage to quality standardization",
+    "DAK ANC in Costa Rica = quality decision-support, not basic data capture"
+  ],
+  "assertions": [
+    {"field": "block2.poc_system_name", "contains": "EDUS"},
+    {"field": "block2.poc_system_type", "contains_any": ["proprietary", "CCSS"]},
+    {"field": "block2.poc_hmis_integration", "equals": false},
+    {"field": "block2.fragmentation_index", "equals": 1},
+    {"field": "block2.active_global_goods", "equals_empty": true},
+    {"field": "risk_flags.RISK_VENDOR_IS_GOVERNMENT", "equals": "ACTIVE"},
+    {"field": "risk_flags.RISK_INTEROPERABILITY_GAP", "equals": "ACTIVE"},
+    {"field": "reliability_score", "minimum": 0.70},
+    {"field": "moh_questions", "minimum_count": 5}
+  ],
+  "expected_moh_questions_themes": [
+    "EDUS IT team capacity for DAK integration in 2026-2027 roadmap",
+    "EDUS-SIVEI data flow existence for ANC indicators",
+    "Impact of active SNOMED CT integration on ANC data elements",
+    "Whether CCSS has reviewed WHO ANC DAK content standards",
+    "How the 90 underperforming health areas are being supported"
+  ]
+}
