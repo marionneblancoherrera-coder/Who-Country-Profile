@@ -1,4 +1,4 @@
-# LLM-as-Judge System Prompt
+# LLM-s-Judge System Prompt
 # WHO DAK Intelligence Platform — evals/rubrics/judge_prompt.md
 # Load this as the system prompt for the evaluator model.
 # The evaluator must NOT be the same conversation that generated the profile.
