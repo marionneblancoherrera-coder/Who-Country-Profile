@@ -173,65 +173,27 @@ If you work in WHO digital health, in a Ministry of Health digital health unit, 
 
 ## Anatomy of the Skill
 
-who-country-profile/
-    ├── SKILL.md (required)
-    │   ├── YAML frontmatter (name, description, license, compatibility, metadata)
-    │   └── Markdown instructions (purpose, when to use, workflow, output format, safety rules)
-    │
-    ├── config/                          Six YAML files — all logic externalized
-    │   ├── country_taxonomy.yml         Six structural dimensions + fragmentation index
-    │   ├── domain_indicators.yml        Universal + DAK-specific indicators (ANC, HIV, TB, Immunization)
-    │   ├── donor_signals.yml            Donor-to-system probabilistic heuristics
-    │   ├── evidence_rules.yml           Evidence types, cross-check rules, official silence policy
-    │   ├── risk_definitions.yml         14 risk flags (5 base + 9 emergent) + mandatory MoH questions
-    │   └── source_hierarchy.yml         Source types, confidence model, retrieval states
-    │
-    ├── intelligence/                    Deterministic pipeline (executes before any LLM call)
-    │   ├── classifier.py                Country classification into six structural categories
-    │   ├── domain_router.py             Domain-specific indicator routing per DAK
-    │   ├── evidence_classifier.py       Confidence flags (V, VA, I, IW, U, C) per field
-    │   ├── priming_engine.py            Block 1 → Block 2 priming + B2 gate enforcement
-    │   └── risk_assessor.py             Risk flag evaluation + MoH question generation
-    │
-    ├── retrieval/                       Open-source data fetching layer
-    │   ├── http_client.py               HTTP client with retry logic and error classification
-    │   ├── pdf_handler.py               PDF download, deduplication (SHA-256), text extraction
-    │   ├── manifest_loader.py           Loads agent-discovered source URLs from JSON manifest
-    │   ├── document_ingester.py         User PDFs, URLs, RAG payloads, WHO MCP stub
-    │   ├── retrieval_states.py          State machine constants for source lifecycle
-    │   └── preflight.py                 Environment and network checks before retrieval
-    │
-    ├── sources/                         Source catalogues and query templates
-    │   ├── source_catalog.yml           What sources exist and what they can provide
-    │   ├── retrieval_strategy.yml       Which sources to use per country profile
-    │   ├── query_templates.yml          PubMed query templates per retrieval intent
-    │   ├── category_catalog.yml         URL sequences per country category
-    │   ├── domain_catalog.yml           DAK domain metadata, patient pathways, equity dimensions
-    │   └── baseline_indicators.json     Controlled baseline indicators for deterministic retrieval
-    │
-    ├── scoring/                         Reliability and quality gates
-    │   ├── reliability_formula.py       Weighted deterministic score (0-1) across both blocks
-    │   └── assertions.py                Ten Level 1 assertions — output blocked if any fail
-    │
-    ├── outputs/                         Formatted profile generation
-    │   ├── html_renderer.py             Human-readable HTML with clickable source chips
-    │   └── compact_writer.py            Compact JSON (~55 tokens) for downstream agents
-    │
-    ├── evals/                           Evaluation framework
-    │   ├── rubrics/
-    │   │   └── judge_prompt.md          LLM-as-judge rubric (12 dimensions)
-    │   ├── golden/
-    │   │   ├── zambia_anc.json          Standard target country case
-    │   │   └── costa_rica_anc.json      Centralized sovereign EHR case
-    │   └── adversarial/
-    │       └── yemen_anc.json           Fragile state graceful degradation case
-    │
-    ├── run_output/                      Generated profiles (per-country directories)
-    │
-    ├── README.md                        Project overview, installation, design principles
-    ├── CHANGELOG.md                     Version history (v1.0.0 → v2.0.0)
-    └── LICENSE                          Apache 2.0
+config/             Six YAML files — all classification logic, risk rules, and
+                    source hierarchies live here. WHO staff edit these without
+                    touching any Python.
 
+intelligence/       Five Python modules — deterministic before any LLM call.
+                    classifier.py → domain_router.py → evidence_classifier.py
+                    → priming_engine.py → risk_assessor.py
+
+retrieval/          HTTP client, PDF handler, manifest loader, document ingester.
+                    Degrades gracefully on failure. Never installs silently.
+
+sources/            Source catalogs, retrieval strategies, query templates,
+                    baseline indicators, and domain metadata.
+
+scoring/            Reliability formula (weighted, deterministic) and
+                    Level 1 assertions (output not presented if any fails).
+
+outputs/            HTML renderer (clickable source chips) and compact JSON writer.
+
+evals/              LLM-as-judge rubric (12 dimensions) and golden test cases
+                    for Zambia, Costa Rica, and Yemen (adversarial).
 ## References
 
 - Mehl, G., Tunçalp, Ö., Ratanaprayul, N., et al. (2021). WHO SMART guidelines: optimising country-level use of guideline recommendations in the digital age. *Lancet Digital Health*, 3(4), e213–e215.
