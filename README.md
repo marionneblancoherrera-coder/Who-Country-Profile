@@ -171,7 +171,9 @@ If you work in WHO digital health, in a Ministry of Health digital health unit, 
 
 ---
 
-## Anatomy of the Skill 
+## Anatomy of the Skill
+
+​```
 who-country-profile/
 ├── SKILL.md (required)
 │   ├── YAML frontmatter (name, description, license, compatibility, metadata)
@@ -230,6 +232,7 @@ who-country-profile/
 ├── README.md                        Project overview, installation, design principles
 ├── CHANGELOG.md                     Version history (v1.0.0 → v2.0.0)
 └── LICENSE                          Apache 2.0
+​```
 
 ---
 
