@@ -172,6 +172,7 @@ If you work in WHO digital health, in a Ministry of Health digital health unit, 
 ---
 
 ## Anatomy of the Skill
+
 who-country-profile/
     ├── SKILL.md (required)
     │   ├── YAML frontmatter (name, description, license, compatibility, metadata)
